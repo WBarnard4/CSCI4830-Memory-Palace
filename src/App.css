@@ -1,6 +1,7 @@
 .home {
   text-align: center;
-  padding: 2rem;
+  padding:12rem;
+  background-color: rgb(87, 48, 105);
 }
 
 .room-grid {
