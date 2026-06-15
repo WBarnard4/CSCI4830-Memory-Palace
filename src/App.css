@@ -1,7 +1,25 @@
 .home {
   text-align: center;
   padding:12rem;
-  background-color: rgb(87, 48, 105);
+  background-color: rgb(30, 25, 125);
+}
+
+.room {
+  width: 99vw;
+  height: 99vh;
+  box-sizing: border-box;
+
+  text-align: center;
+  background-color: rgb(100, 100, 100);
+
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .room-grid {
@@ -16,4 +34,29 @@
   padding: 2rem;
   font-size: 1rem;
   cursor: pointer;
+
+  height: 140px;
+  border: 3px solid white;
+  border-radius: 12px;
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+}
+
+.bedroom-button {
+  background-image: url("src/assets/generic_bedroom.jpg");
+}
+
+.living-room-button {
+  background-image: url("src/assets/generic_living_room.jpg");
+}
+
+.kitchen-button {
+  background-image: url("src/assets/generic_kitchen.png");
+}
+
+.bathroom-button {
+  background-image: url("src/assets/generic_bathroom.jpg");
 }
