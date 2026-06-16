@@ -3,9 +3,67 @@ import { useState, useRef } from "react";
 export default function RoomScreen({ activeRoom, onGoHome }) {
   // state which stores ideas
   const [ideas, setIdeas] = useState([]);
+  const [popupPosition, setPopupPosition] = useState(null);
+  const imageInputRef = useRef(null);
 
   // CORE CHANGE: Reference to calculate boundaries
   const roomRef = useRef(null);
+
+  function openImagePicker() {
+    imageInputRef.current.click();
+  }
+
+  function handleImageSelected(a) {
+
+    // TODO: Change to persistent storage (IndexDB)
+    const file = a.target.files[0];
+    const url = URL.createObjectURL(file);
+
+    // File is not found or popup is not active
+    if (!file || !popupPosition) {
+      return;
+    }
+
+    // Image is a new idea
+    const newIdea = {
+      id: Date.now(),
+      type: "image",
+      x: popupPosition.x,
+      y: popupPosition.y,
+      // text: url,
+      imageSrc: url,
+    };
+
+    setIdeas([...ideas, newIdea]);
+    setPopupPosition(null);
+
+    a.target.value = "";
+
+  }
+
+
+  function closePopup() {
+    setPopupPosition(null);
+  }
+
+  function addTextIdea() {
+    if (!popupPosition) {
+      return;
+    }
+
+    const newIdea = {
+      id: Date.now(),
+      type: "text",
+      x: popupPosition.x,
+      y: popupPosition.y,
+      text: "New Idea",
+    };
+
+    setIdeas([...ideas, newIdea]);
+    setPopupPosition(null);
+  }
+
+
 
   // Helper to map the activeRoom string to the correct image asset
   const getBackgroundImage = () => {
@@ -30,18 +88,19 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
 
     if (!roomRef.current) return;
 
+    // If the popup is already visible, do not move it
+    if (popupPosition != null) {
+      return;
+    }
+
+
+
+    // Set the popup to the cursor position
     const rect = roomRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    const newIdea = {
-      id: Date.now(),
-      x: x,
-      y: y,
-      text: "New Idea",
-    };
-
-    setIdeas([...ideas, newIdea]);
+    setPopupPosition({ x, y });
   };
 
   return (
@@ -49,6 +108,7 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
       ref={roomRef}
       className="room"
       onDoubleClick={handleDoubleClick}
+      onClick={closePopup}
       style={{
         backgroundImage: getBackgroundImage(),
         position: "relative", // Keeps absolute-positioned ideas inside this div
@@ -66,6 +126,48 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
           Home
         </button>
       </div>
+
+      {/* File Explorer Popup for Image inputs */}
+      <input
+        onClick={(e) => e.stopPropagation()}
+        ref={imageInputRef}
+        type="file"
+        accept="image/*"
+        style={{ display: "none" }}
+        onChange={handleImageSelected}
+      />
+
+      {/* Popup on double click */}
+      {popupPosition && (
+        <div
+          style={{
+            position: "absolute",
+            left: `${popupPosition.x}px`,
+            top: `${popupPosition.y}px`,
+            transform: "translate(-50%, -50%)",
+            backgroundColor: "white",
+            border: "2px solid black",
+            borderRadius: "8px",
+            padding: "1rem",
+            zIndex: 9,
+            color: "black",
+            boxShadow: "0 4px 8px rgba(0,0,0,0.4)",
+          }}
+          onDoubleClick={(e) => e.stopPropagation()}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button onClick={closePopup}>X</button>
+
+          <div
+            style={{ marginTop: "1rem" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button onClick={addTextIdea}>Text</button>
+            <button onClick={openImagePicker}>Image</button>
+          </div>
+        </div>
+      )}
+
 
       {/* CORE CHANGE: Drawing the ideas from our memory onto the screen */}
       {ideas.map((idea) => (
@@ -85,6 +187,18 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
           }}
         >
           {idea.text}
+
+          {idea.type === "image" && (
+            <img
+              src={idea.imageSrc}
+              alt="User idea"
+              style={{
+                width: "100px",
+                height: "100px",
+                objectFit: "contain",
+              }}
+            />
+          )}
         </div>
       ))}
     </div>
