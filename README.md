@@ -1,16 +1,8 @@
-# React + Vite
+# Memory Palace
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Memory Palace is a web application that translates the memory palace mnemonic technique into a web experience. Users can create a "room" with a provided look or upload a background image of their own. In these rooms, users can place "ideas" by double clicking to input text or images at locations of their choice. Now, users can use the location of ideas in the room to help memorize concepts by associating the content of the ideas in the space of the room. Users can also organize their ideas into a sequential order and have the room highlight them using the "path" feature for added visual clarity and memorization help.
 
-Currently, two official plugins are available:
+# Release Notes
+6/18/26
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Memory Palace currently implements a Home Screen that gives users the option to load or create new rooms. The load feature is unimplemented, but users can create a new room with the four provided templates. In the room, users can create new ideas by double clicking to open a popup and choose between text or image. Selecting text creates a text idea with placeholder text while selecting image opens the file explorer to create an image idea with the selected image. A home button is also present that takes the user back to the Home Screen.
