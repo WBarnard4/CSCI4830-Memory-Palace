@@ -168,7 +168,6 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
         </div>
       )}
 
-
       {/* CORE CHANGE: Drawing the ideas from our memory onto the screen */}
       {ideas.map((idea) => (
         <Idea 
@@ -177,7 +176,9 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
           x={idea.x}
           y={idea.y}
           text={idea.text}
-          imageSrc={idea.imageSrc}></Idea>
+          imageSrc={idea.imageSrc}
+          key={idea.id}>
+        </Idea>
       ))}
     </div>
   );
