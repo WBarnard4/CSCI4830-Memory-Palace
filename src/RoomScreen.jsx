@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { Idea } from "./Idea.jsx";
 
 export default function RoomScreen({ activeRoom, onGoHome }) {
   // state which stores ideas
@@ -93,12 +94,10 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
       return;
     }
 
-
-
     // Set the popup to the cursor position
     const rect = roomRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const x = (e.clientX / rect.width) * 100;
+    const y = (e.clientY / rect.height) * 100;
 
     setPopupPosition({ x, y });
   };
@@ -111,6 +110,7 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
       onClick={closePopup}
       style={{
         backgroundImage: getBackgroundImage(),
+        backgroundSize: "cover",
         position: "relative", // Keeps absolute-positioned ideas inside this div
         overflow: "hidden",
       }}
@@ -142,8 +142,8 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
         <div
           style={{
             position: "absolute",
-            left: `${popupPosition.x}px`,
-            top: `${popupPosition.y}px`,
+            left: `${popupPosition.x}%`,
+            top: `${popupPosition.y}%`,
             transform: "translate(-50%, -50%)",
             backgroundColor: "white",
             border: "2px solid black",
@@ -171,35 +171,13 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
 
       {/* CORE CHANGE: Drawing the ideas from our memory onto the screen */}
       {ideas.map((idea) => (
-        <div
-          key={idea.id}
-          style={{
-            position: "absolute",
-            left: `${idea.x}px`,
-            top: `${idea.y}px`,
-            transform: "translate(-50%, -50%)", // Centers the box on the mouse click
-            backgroundColor: "white",
-            padding: "10px",
-            border: "2px solid black",
-            borderRadius: "8px",
-            color: "black",
-            boxShadow: "0 4px 6px rgba(0,0,0,0.3)",
-          }}
-        >
-          {idea.text}
-
-          {idea.type === "image" && (
-            <img
-              src={idea.imageSrc}
-              alt="User idea"
-              style={{
-                width: "100px",
-                height: "100px",
-                objectFit: "contain",
-              }}
-            />
-          )}
-        </div>
+        <Idea 
+          id={idea.id}
+          type={idea.type}
+          x={idea.x}
+          y={idea.y}
+          text={idea.text}
+          imageSrc={idea.imageSrc}></Idea>
       ))}
     </div>
   );
