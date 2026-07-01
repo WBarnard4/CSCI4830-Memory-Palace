@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { Menu } from "./Menu.jsx"
 
 export default function RoomScreen({ activeRoom, onGoHome }) {
   // state which stores ideas
@@ -115,16 +116,20 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
         overflow: "hidden",
       }}
     >
+      {/* Menu Icon that implements most room switching and saving features */}
+      {/* TODO: Add saving, loading, creating, and change reporting. */}
+      <div style={{ position: "relative", zIndex: 100 }}>
+        <Menu
+          saveRoom={() => null}
+          loadRoom={() => null}
+          newRoom={() => null}
+          goHome={onGoHome}
+          areChanges={() => true}
+        />
+      </div>
       {/* UI Layer: Kept on top with zIndex */}
       <div style={{ position: "relative", zIndex: 10 }}>
         <h1>You are in the {activeRoom}</h1>
-        <button
-          className="room-button"
-          onClick={onGoHome}
-          style={{ height: "auto", padding: "1rem" }}
-        >
-          Home
-        </button>
       </div>
 
       {/* File Explorer Popup for Image inputs */}
