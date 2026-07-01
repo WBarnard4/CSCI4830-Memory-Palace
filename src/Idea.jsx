@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 
-export function Idea({ id, type, x, y, text, imageSrc }) {
+export function Idea({ id, type, x, y, text, imageSrc} ) {
   const [active, setActive] = useState(false);
   const ideaInfo = {
     id: id,
