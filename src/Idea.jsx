@@ -1,7 +1,8 @@
 import { useState, useRef } from "react";
 
-export function Idea({ id, type, x, y, text, imageSrc, updateIdea, deleteIdea} ) {
+export function Idea({ id, type, x, y, text, imageSrc, updateIdea, deleteIdea }) {
   const [active, setActive] = useState(false);
+  const imageInputRef = useRef(null);
   const ideaInfo = {
     id: id,
     type: type,
@@ -26,11 +27,6 @@ export function Idea({ id, type, x, y, text, imageSrc, updateIdea, deleteIdea} )
     let query1 = formData.get("posY");
     let query2 = formData.get("text");
     let query3 = formData.get("img");
-    
-    // if (query) ideaInfo.x = query;
-    // if (query1) ideaInfo.y = query1;
-    // if (query2) ideaInfo.text = query2;
-    // if (query3) ideaInfo.img = query3;
 
     if (!query) query = ideaInfo.x;
     if (!query1) query1 = ideaInfo.y;
@@ -44,7 +40,6 @@ export function Idea({ id, type, x, y, text, imageSrc, updateIdea, deleteIdea} )
       y: Number(query1),
       text: query2,
       imageSrc: query3,
-      
     }
 
     handleClick();
@@ -55,12 +50,39 @@ export function Idea({ id, type, x, y, text, imageSrc, updateIdea, deleteIdea} )
     deleteIdea(ideaInfo.id);
   }
 
+  function openImagePicker() {
+    imageInputRef.current.click();
+  }
+
+  function handleNewImageSelected(a) {
+
+    const file = a.target.files[0];
+    const url = URL.createObjectURL(file);
+    console.log(url);
+
+    // File is not found or popup is not active
+    if (!file) {
+      return;
+    }
+
+    const newInfo = {
+      id: ideaInfo.id,
+      type: ideaInfo.type,
+      x: ideaInfo.x,
+      y: ideaInfo.y,
+      text: ideaInfo.text,
+      imageSrc: url,
+    }
+    updateIdea(newInfo);
+    a.target.value = "";
+  }
+
   return (
     <div>
       <div
         key={ideaInfo.id}
-        // onClick={handleClick()}
-        onMouseUp={handleClick}
+        onClick={handleClick}
+        // onChangeCapture={}
         style={{
           position: "absolute",
           left: `${ideaInfo.x}%`,
@@ -88,20 +110,28 @@ export function Idea({ id, type, x, y, text, imageSrc, updateIdea, deleteIdea} )
           />
         )}
       </div>
+      <input
+        onClick={(e) => e.stopPropagation()}
+        ref={imageInputRef}
+        type="file"
+        accept="image/*"
+        style={{ display: "none" }}
+        onChange={handleNewImageSelected}
+      />
       {active && (
         <div
-        style={{
-          position: "absolute",
-          left: `${ideaInfo.x + 10}%`,
-          top: `${ideaInfo.y}%`,
-          transform: "translate(-50%, -50%)", // Centers the box on the mouse click
-          backgroundColor: "white",
-          padding: "10px",
-          border: "2px solid black",
-          borderRadius: "8px",
-          color: "black",
-          boxShadow: "0 4px 6px rgba(0,0,0,0.3)",
-        }}>
+          style={{
+            position: "absolute",
+            left: `${ideaInfo.x + 10}%`,
+            top: `${ideaInfo.y}%`,
+            transform: "translate(-50%, -50%)", // Centers the box on the mouse click
+            backgroundColor: "white",
+            padding: "10px",
+            border: "2px solid black",
+            borderRadius: "8px",
+            color: "black",
+            boxShadow: "0 4px 6px rgba(0,0,0,0.3)",
+          }}>
           <label></label>
           <form onSubmit={setInfo}>
             <label name="posX">Set x%: Currently {Math.round(ideaInfo.x)}</label>
@@ -118,10 +148,9 @@ export function Idea({ id, type, x, y, text, imageSrc, updateIdea, deleteIdea} )
             <br />
             <textarea name="text" defaultValue={ideaInfo.text}></textarea>
             <br />
-
             <label name="img">Change Image Source</label>
             <br />
-            <input name="img"></input>
+            <button onClick={openImagePicker}>Select Image</button>
             <br />
 
             <button type="submit">Submit</button>

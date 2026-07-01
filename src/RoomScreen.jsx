@@ -19,7 +19,7 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
     // TODO: Change to persistent storage (IndexDB)
     const file = a.target.files[0];
     const url = URL.createObjectURL(file);
-
+    console.log(url);
     // File is not found or popup is not active
     if (!file || !popupPosition) {
       return;
@@ -79,7 +79,6 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
       setIdeas(current);
     }
   }
-
 
 
   // Helper to map the activeRoom string to the correct image asset
@@ -196,6 +195,8 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
           imageSrc={idea.imageSrc}
           updateIdea={updateIdea}
           deleteIdea={deleteIdea}
+          imageInputRef={imageInputRef}
+          openImagePicker={openImagePicker}
           key={idea.id}>
         </Idea>
       ))}
