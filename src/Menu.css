@@ -88,3 +88,24 @@
   line-height: 1.2;
   color: black;
 }
+
+/* Arrows for undo and redo */
+.menu-arrows {
+  display: flex;
+  gap: 6px;
+}
+
+.menu-arrows button {
+  flex: 1;
+  height: 30px;
+  padding: 0;
+  font-size: 18px;
+}
+
+.menu-arrow-left::before {
+  content: "←";
+}
+
+.menu-arrow-right::before {
+  content: "→";
+}

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import "./Menu.css";
 
-export function Menu({ saveRoom, loadRoom, newRoom, goHome, areChanges }) {
+export function Menu({ saveRoom, loadRoom, newRoom, setBackgroundImage, undo, redo, goHome, areChanges }) {
 	const [opened, setOpened] = useState(false);
 	const [areYouSurePopup, setAreYouSurePopup] = useState(false);
 	const [sureCallback, setSureCallback] = useState(null);
@@ -68,8 +68,8 @@ export function Menu({ saveRoom, loadRoom, newRoom, goHome, areChanges }) {
 	}, [showSavedPopup]);
 
 	/**
-	 * Verifies no data is overwritten before calling the loadRoom
-	 * function.
+	 * Verifies no data is overwritten before calling the loadRoom argument
+	 * Placeholder until the loadRoom argument is implemented;
 	 *
 	 * Feature coming soon TODO: Implement
 	 */
@@ -77,6 +77,23 @@ export function Menu({ saveRoom, loadRoom, newRoom, goHome, areChanges }) {
 		setComingSoon(true);
 	}
 
+	/**
+	 * Placeholder until the undo argument is implemented.
+	 *
+	 * Feature coming soon TODO: Implement
+	 */
+	function undoComingSoon() {
+		setComingSoon(true);
+	}
+
+	/**
+	 * Placeholder until the redo argument is implemented.
+	 *
+	 * Feature coming soon TODO: Implement
+	 */
+	function redoComingSoon() {
+		setComingSoon(true);
+	}
 	useEffect(() => {
 		if (comingSoon === false) {
 			return;
@@ -123,6 +140,11 @@ export function Menu({ saveRoom, loadRoom, newRoom, goHome, areChanges }) {
 							<button onClick={saveWithFeedback}>Save</button>
 							<button onClick={loadRoomComingSoon}>Load</button>
 							<button onClick={() => verifyWithPopup(newRoom)}>New Room</button>
+							<button onClick={setBackgroundImage}>Change Background</button>
+							<div className="menu-arrows">
+								<button onClick={undoComingSoon} className="menu-arrow-left"></button>
+								<button onClick={redoComingSoon} className="menu-arrow-right"></button>
+							</div>
 							<button onClick={() => verifyWithPopup(goHome)}>Home</button>
 						</div>
 					)}

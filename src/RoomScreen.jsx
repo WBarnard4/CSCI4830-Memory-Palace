@@ -6,11 +6,27 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
   const [ideas, setIdeas] = useState([]);
   const [popupPosition, setPopupPosition] = useState(null);
   const imageInputRef = useRef(null);
+  const imageInputTypeRef = useRef("idea");
+  const [backgroundUrl, setBackgroundUrl] = useState(() => {
+    switch (activeRoom) {
+      case "Bedroom":
+        return 'src/assets/generic_bedroom.jpg';
+      case "Kitchen":
+        return 'src/assets/generic_kitchen.png';
+      case "Living Room":
+        return 'src/assets/generic_living_room.jpg';
+      case "Bathroom":
+        return 'src/assets/generic_bathroom.jpg';
+      default:
+        return 'none';
+    }
+  })
 
   // CORE CHANGE: Reference to calculate boundaries
   const roomRef = useRef(null);
 
-  function openImagePicker() {
+  function openImagePicker(type) {
+    imageInputTypeRef.current = type;
     imageInputRef.current.click();
   }
 
@@ -18,29 +34,37 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
 
     // TODO: Change to persistent storage (IndexDB)
     const file = a.target.files[0];
+
+    // File is not found
+    if (!file) {
+      return;
+
+    }
     const url = URL.createObjectURL(file);
 
-    // File is not found or popup is not active
-    if (!file || !popupPosition) {
-      return;
-    }
 
     // Image is a new idea
-    const newIdea = {
-      id: Date.now(),
-      type: "image",
-      x: popupPosition.x,
-      y: popupPosition.y,
-      // text: url,
-      imageSrc: url,
-    };
+    if (imageInputTypeRef.current === "idea" && popupPosition) {
+      const newIdea = {
+        id: Date.now(),
+        type: "image",
+        x: popupPosition.x,
+        y: popupPosition.y,
+        // text: url,
+        imageSrc: url,
+      };
 
-    setIdeas([...ideas, newIdea]);
-    setPopupPosition(null);
+      setIdeas([...ideas, newIdea]);
+      setPopupPosition(null);
+    } else if (imageInputTypeRef.current === "background") {
+      setBackgroundUrl(url);
+    }
+
 
     a.target.value = "";
 
   }
+
 
 
   function closePopup() {
@@ -64,23 +88,6 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
     setPopupPosition(null);
   }
 
-
-
-  // Helper to map the activeRoom string to the correct image asset
-  const getBackgroundImage = () => {
-    switch (activeRoom) {
-      case "Bedroom":
-        return 'url("src/assets/generic_bedroom.jpg")';
-      case "Kitchen":
-        return 'url("src/assets/generic_kitchen.png")';
-      case "Living Room":
-        return 'url("src/assets/generic_living_room.jpg")';
-      case "Bathroom":
-        return 'url("src/assets/generic_bathroom.jpg")';
-      default:
-        return "none";
-    }
-  };
 
   // CORE CHANGE: The math for placing the idea
   const handleDoubleClick = (e) => {
@@ -111,7 +118,7 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
       onDoubleClick={handleDoubleClick}
       onClick={closePopup}
       style={{
-        backgroundImage: getBackgroundImage(),
+        backgroundImage: backgroundUrl === "none" ? "none" : `url("${backgroundUrl}")`,
         position: "relative", // Keeps absolute-positioned ideas inside this div
         overflow: "hidden",
       }}
@@ -123,6 +130,9 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
           saveRoom={() => null}
           loadRoom={() => null}
           newRoom={() => null}
+          setBackgroundImage={() => openImagePicker("background")}
+          undo={() => null}
+          redo={() => null}
           goHome={onGoHome}
           areChanges={() => true}
         />
@@ -139,7 +149,7 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
         type="file"
         accept="image/*"
         style={{ display: "none" }}
-        onChange={handleImageSelected}
+        onChange={(a) => handleImageSelected(a, "idea")}
       />
 
       {/* Popup on double click */}
@@ -168,7 +178,7 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
             onClick={(e) => e.stopPropagation()}
           >
             <button onClick={addTextIdea}>Text</button>
-            <button onClick={openImagePicker}>Image</button>
+            <button onClick={() => openImagePicker("idea")}>Image</button>
           </div>
         </div>
       )}
