@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 
-export function Idea({ id, type, x, y, text, imageSrc} ) {
+export function Idea({ id, type, x, y, text, imageSrc, updateIdea, deleteIdea} ) {
   const [active, setActive] = useState(false);
   const ideaInfo = {
     id: id,
@@ -22,17 +22,37 @@ export function Idea({ id, type, x, y, text, imageSrc} ) {
     // Read the form data
     const form = e.target;
     const formData = new FormData(form);
-    const query = formData.get("posX");
-    const query1 = formData.get("posY");
-    const query2 = formData.get("text");
-    const query3 = formData.get("img");
+    let query = formData.get("posX");
+    let query1 = formData.get("posY");
+    let query2 = formData.get("text");
+    let query3 = formData.get("img");
+    
+    // if (query) ideaInfo.x = query;
+    // if (query1) ideaInfo.y = query1;
+    // if (query2) ideaInfo.text = query2;
+    // if (query3) ideaInfo.img = query3;
 
-    if (query) ideaInfo.x = query;
-    if (query1) ideaInfo.y = query1;
-    if (query2) ideaInfo.text = query2;
-    if (query3) ideaInfo.img = query3;
+    if (!query) query = ideaInfo.x;
+    if (!query1) query1 = ideaInfo.y;
+    if (!query2) query2 = ideaInfo.text;
+    if (!query3) query3 = ideaInfo.imageSrc;
+
+    const newInfo = {
+      id: ideaInfo.id,
+      type: ideaInfo.type,
+      x: Number(query),
+      y: Number(query1),
+      text: query2,
+      imageSrc: query3,
+      
+    }
 
     handleClick();
+    updateIdea(newInfo);
+  }
+
+  function handleDelete() {
+    deleteIdea(ideaInfo.id);
   }
 
   return (
@@ -86,12 +106,12 @@ export function Idea({ id, type, x, y, text, imageSrc} ) {
           <form onSubmit={setInfo}>
             <label name="posX">Set x%: Currently {Math.round(ideaInfo.x)}</label>
             <br />
-            <input name="posX"></input>
+            <input name="posX" type="number"></input>
             <br />
 
             <label name="posY">Set y%: Currently {Math.round(ideaInfo.y)}</label>
             <br />
-            <input name="posY"></input>
+            <input name="posY" type="number"></input>
             <br />
 
             <label name="text">Change Text</label>
@@ -105,6 +125,7 @@ export function Idea({ id, type, x, y, text, imageSrc} ) {
             <br />
 
             <button type="submit">Submit</button>
+            <button type="button" onClick={handleDelete}>Delete Idea</button>
           </form>
         </div>
       )}

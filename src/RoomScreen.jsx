@@ -64,6 +64,22 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
     setPopupPosition(null);
   }
 
+  function updateIdea(newInfo) {
+    let current = [...ideas];
+    let index = current.findIndex(info => info.id === newInfo.id);
+    current[index] = newInfo;
+    setIdeas(current);
+  }
+
+  function deleteIdea(id) {
+    let current = [...ideas];
+    let index = current.findIndex(info => info.id === id);
+    if (index != -1) {
+      current.splice(index, 1);
+      setIdeas(current);
+    }
+  }
+
 
 
   // Helper to map the activeRoom string to the correct image asset
@@ -99,6 +115,7 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
     const x = (e.clientX / rect.width) * 100;
     const y = (e.clientY / rect.height) * 100;
 
+    console.log(ideas);
     setPopupPosition({ x, y });
   };
 
@@ -177,6 +194,8 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
           y={idea.y}
           text={idea.text}
           imageSrc={idea.imageSrc}
+          updateIdea={updateIdea}
+          deleteIdea={deleteIdea}
           key={idea.id}>
         </Idea>
       ))}
