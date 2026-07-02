@@ -1,15 +1,116 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import { Menu } from "./Menu.jsx"
+import { Idea } from "./Idea.jsx";
+
+const BASE_VIEWPORT_WIDTH = 1920;
+const BASE_VIEWPORT_HEIGHT = 1080;
 
 export default function RoomScreen({ activeRoom, onGoHome }) {
   // state which stores ideas
   const [ideas, setIdeas] = useState([]);
   const [popupPosition, setPopupPosition] = useState(null);
   const imageInputRef = useRef(null);
+  const imageInputTypeRef = useRef("idea");
+  const [backgroundUrl, setBackgroundUrl] = useState(() => {
+    switch (activeRoom) {
+      case "Bedroom":
+        return 'src/assets/generic_bedroom.jpg';
+      case "Kitchen":
+        return 'src/assets/generic_kitchen.png';
+      case "Living Room":
+        return 'src/assets/generic_living_room.jpg';
+      case "Bathroom":
+        return 'src/assets/generic_bathroom.jpg';
+      default:
+        return 'none';
+    }
+  })
+  const [backgroundDimensions, setBackgroundDimensions] = useState({
+    width: 1920,
+    height: 1080,
+  });
+
+  const [baseRoomDimensions, setBaseRoomDimensions] = useState({
+    width: 1920,
+    height: 1080,
+  });
+  const [roomDimensions, setRoomDimensions] = useState({
+    width: 1920,
+    height: 1080,
+  });
+  const [roomScale, setRoomScale] = useState(1);
 
   // CORE CHANGE: Reference to calculate boundaries
   const roomRef = useRef(null);
 
-  function openImagePicker() {
+  // Sets the background dimensions to match the background image whenever the background changes.
+  useEffect(() => {
+    if (backgroundUrl === "none") {
+      return;
+    }
+
+    const image = new Image();
+
+    // When the image loads, set the background dimensions to it.
+    image.onload = () => {
+      setBackgroundDimensions({
+        width: image.naturalWidth,
+        height: image.naturalHeight,
+      });
+    };
+
+    // Load the image as the background image
+    image.src = backgroundUrl;
+  }, [backgroundUrl]);
+
+  // Recalculate the room dimensions on background or window dimension changes.
+  useEffect(() => {
+    function getContainedDimensions(containerWidth, containerHeight) {
+      // Find the min scale to keep the background on the screen
+      const widthScale = containerWidth / backgroundDimensions.width;
+      const heightScale = containerHeight / backgroundDimensions.height;
+      const scale = widthScale < heightScale ? widthScale : heightScale;
+
+      return {
+        width: backgroundDimensions.width * scale,
+        height: backgroundDimensions.height * scale,
+      };
+    }
+
+    function updateRoomDimensions() {
+      // Find the dimensions in the baseline viewport.
+      const newBaseRoomDimensions = getContainedDimensions(
+        BASE_VIEWPORT_WIDTH,
+        BASE_VIEWPORT_HEIGHT
+      );
+
+      // Find the dimensions in the current viewport.
+      const newRoomDimensions = getContainedDimensions(
+        window.innerWidth,
+        window.innerHeight
+      );
+
+      // Compare the current dimensions against the baseline dimensions.
+      const newRoomScale = newRoomDimensions.width / newBaseRoomDimensions.width;
+
+      setBaseRoomDimensions(newBaseRoomDimensions);
+      setRoomDimensions(newRoomDimensions);
+      setRoomScale(newRoomScale);
+    }
+
+    updateRoomDimensions();
+
+    window.addEventListener("resize", updateRoomDimensions);
+
+    return () => {
+      window.removeEventListener("resize", updateRoomDimensions);
+    };
+  }, [backgroundDimensions]);
+
+
+
+  function openImagePicker(type) {
+    imageInputTypeRef.current = type;
     imageInputRef.current.click();
   }
 
@@ -17,29 +118,38 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
 
     // TODO: Change to persistent storage (IndexDB)
     const file = a.target.files[0];
+
+    // File is not found
+    if (!file) {
+      return;
+
+    }
     const url = URL.createObjectURL(file);
 
-    // File is not found or popup is not active
-    if (!file || !popupPosition) {
-      return;
-    }
+    console.log(url);
 
     // Image is a new idea
-    const newIdea = {
-      id: Date.now(),
-      type: "image",
-      x: popupPosition.x,
-      y: popupPosition.y,
-      // text: url,
-      imageSrc: url,
-    };
+    if (imageInputTypeRef.current === "idea" && popupPosition) {
+      const newIdea = {
+        id: Date.now(),
+        type: "image",
+        x: popupPosition.x,
+        y: popupPosition.y,
+        // text: url,
+        imageSrc: url,
+      };
 
-    setIdeas([...ideas, newIdea]);
-    setPopupPosition(null);
+      setIdeas([...ideas, newIdea]);
+      setPopupPosition(null);
+    } else if (imageInputTypeRef.current === "background") {
+      setBackgroundUrl(url);
+    }
+
 
     a.target.value = "";
 
   }
+
 
 
   function closePopup() {
@@ -63,23 +173,21 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
     setPopupPosition(null);
   }
 
+  function updateIdea(newInfo) {
+    let current = [...ideas];
+    let index = current.findIndex(info => info.id === newInfo.id);
+    current[index] = newInfo;
+    setIdeas(current);
+  }
 
-
-  // Helper to map the activeRoom string to the correct image asset
-  const getBackgroundImage = () => {
-    switch (activeRoom) {
-      case "Bedroom":
-        return 'url("src/assets/generic_bedroom.jpg")';
-      case "Kitchen":
-        return 'url("src/assets/generic_kitchen.png")';
-      case "Living Room":
-        return 'url("src/assets/generic_living_room.jpg")';
-      case "Bathroom":
-        return 'url("src/assets/generic_bathroom.jpg")';
-      default:
-        return "none";
+  function deleteIdea(id) {
+    let current = [...ideas];
+    let index = current.findIndex(info => info.id === id);
+    if (index != -1) {
+      current.splice(index, 1);
+      setIdeas(current);
     }
-  };
+  }
 
   // CORE CHANGE: The math for placing the idea
   const handleDoubleClick = (e) => {
@@ -93,114 +201,123 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
       return;
     }
 
-
-
     // Set the popup to the cursor position
     const rect = roomRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
 
+    console.log(ideas);
     setPopupPosition({ x, y });
   };
 
   return (
-    <div
-      ref={roomRef}
-      className="room"
-      onDoubleClick={handleDoubleClick}
-      onClick={closePopup}
-      style={{
-        backgroundImage: getBackgroundImage(),
-        position: "relative", // Keeps absolute-positioned ideas inside this div
-        overflow: "hidden",
-      }}
-    >
-      {/* UI Layer: Kept on top with zIndex */}
-      <div style={{ position: "relative", zIndex: 10 }}>
-        <h1>You are in the {activeRoom}</h1>
-        <button
-          className="room-button"
-          onClick={onGoHome}
-          style={{ height: "auto", padding: "1rem" }}
-        >
-          Home
-        </button>
+    <div className="room-viewport">
+      {/* Menu Icon that implements most room switching and saving features */}
+      {/* TODO: Add saving, loading, creating, and change reporting. */}
+      <div style={{ position: "relative", zIndex: 100 }}>
+        <Menu
+          saveRoom={() => null}
+          loadRoom={() => null}
+          newRoom={() => null}
+          setBackgroundImage={() => openImagePicker("background")}
+          undo={() => null}
+          redo={() => null}
+          goHome={onGoHome}
+          areChanges={() => true}
+        />
       </div>
-
-      {/* File Explorer Popup for Image inputs */}
-      <input
-        onClick={(e) => e.stopPropagation()}
-        ref={imageInputRef}
-        type="file"
-        accept="image/*"
-        style={{ display: "none" }}
-        onChange={handleImageSelected}
-      />
-
-      {/* Popup on double click */}
-      {popupPosition && (
+      {/* Wrapper div to make the browser layout treat a room as the correct size and allow popups to overflow*/}
+      <div
+        className="room-wrapper"
+        style={{
+          width: `${roomDimensions.width}px`,
+          height: `${roomDimensions.height}px`,
+          overflow: "visible",
+        }}
+      >
         <div
+          ref={roomRef}
+          className="room"
+          onDoubleClick={handleDoubleClick}
+          onClick={closePopup}
           style={{
-            position: "absolute",
-            left: `${popupPosition.x}px`,
-            top: `${popupPosition.y}px`,
-            transform: "translate(-50%, -50%)",
-            backgroundColor: "white",
-            border: "2px solid black",
-            borderRadius: "8px",
-            padding: "1rem",
-            zIndex: 9,
-            color: "black",
-            boxShadow: "0 4px 8px rgba(0,0,0,0.4)",
-          }}
-          onDoubleClick={(e) => e.stopPropagation()}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <button onClick={closePopup}>X</button>
+            width: `${baseRoomDimensions.width}px`,
+            height: `${baseRoomDimensions.height}px`,
+            backgroundImage: backgroundUrl === "none" ? "none" : `url("${backgroundUrl}")`,
+            backgroundSize: "100% 100%",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+            position: "relative",
+            overflow: "hidden",
+            transform: `scale(${roomScale})`,
+            transformOrigin: "top left",
 
+          }}
+        >
+          {/* UI Layer: Kept on top with zIndex */}
+          <div style={{ position: "relative", zIndex: 10 }}>
+            <h1>You are in the {activeRoom}</h1>
+          </div>
+
+          {/* File Explorer Popup for Image inputs */}
+          <input
+            onClick={(e) => e.stopPropagation()}
+            ref={imageInputRef}
+            type="file"
+            accept="image/*"
+            style={{ display: "none" }}
+            onChange={(a) => handleImageSelected(a)}
+          />
+
+          {/* CORE CHANGE: Drawing the ideas from our memory onto the screen */}
+          {ideas.map((idea) => (
+            <Idea
+              id={idea.id}
+              type={idea.type}
+              x={idea.x}
+              y={idea.y}
+              text={idea.text}
+              imageSrc={idea.imageSrc}
+              updateIdea={updateIdea}
+              deleteIdea={deleteIdea}
+              imageInputRef={imageInputRef}
+              openImagePicker={openImagePicker}
+              key={idea.id}>
+            </Idea>
+          ))}
+        </div>
+
+        {/* Popup on double click */}
+        {popupPosition && (
           <div
-            style={{ marginTop: "1rem" }}
+            style={{
+              position: "absolute",
+              left: `${popupPosition.x}%`,
+              top: `${popupPosition.y}%`,
+              transform: "translate(-50%, -50%)",
+              backgroundColor: "white",
+              border: "2px solid black",
+              borderRadius: "8px",
+              padding: "1rem",
+              zIndex: 9,
+              color: "black",
+              boxShadow: "0 4px 8px rgba(0,0,0,0.4)",
+            }}
+            onDoubleClick={(e) => e.stopPropagation()}
             onClick={(e) => e.stopPropagation()}
           >
-            <button onClick={addTextIdea}>Text</button>
-            <button onClick={openImagePicker}>Image</button>
+            <button onClick={closePopup}>X</button>
+
+            <div
+              style={{ marginTop: "1rem" }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button onClick={addTextIdea}>Text</button>
+              <button onClick={() => openImagePicker("idea")}>Image</button>
+            </div>
           </div>
-        </div>
-      )}
-
-
-      {/* CORE CHANGE: Drawing the ideas from our memory onto the screen */}
-      {ideas.map((idea) => (
-        <div
-          key={idea.id}
-          style={{
-            position: "absolute",
-            left: `${idea.x}px`,
-            top: `${idea.y}px`,
-            transform: "translate(-50%, -50%)", // Centers the box on the mouse click
-            backgroundColor: "white",
-            padding: "10px",
-            border: "2px solid black",
-            borderRadius: "8px",
-            color: "black",
-            boxShadow: "0 4px 6px rgba(0,0,0,0.3)",
-          }}
-        >
-          {idea.text}
-
-          {idea.type === "image" && (
-            <img
-              src={idea.imageSrc}
-              alt="User idea"
-              style={{
-                width: "100px",
-                height: "100px",
-                objectFit: "contain",
-              }}
-            />
-          )}
-        </div>
-      ))}
+        )}
+      </div>
     </div>
   );
 }

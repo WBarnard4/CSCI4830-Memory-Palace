@@ -4,9 +4,25 @@
   background-color: rgb(30, 25, 125);
 }
 
+.room-viewport {
+  width: 99.9vw;
+  height: 99.9dvh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  background: black;
+}
+
+.room-wrapper {
+  position: relative;
+  flex-shrink: 0;
+  overflow: visible;
+}
+
 .room {
-  width: 99vw;
-  height: 99vh;
+  width: 100vw;
+  height: 100dvh;
   box-sizing: border-box;
 
   text-align: center;

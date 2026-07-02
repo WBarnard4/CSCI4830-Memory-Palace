@@ -1,0 +1,111 @@
+.menu {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 1000;
+  font-family: inherit;
+}
+
+/* Closed Menu */
+.menu-closed {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #6b7280;
+  border: 1px solid #8b929e;
+  border-radius: 50%;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+/* 3 Lines on Menu */
+.menu-closed::before {
+  content: "";
+  width: 24px;
+  height: 3px;
+  background: white;
+  border-radius: 2px;
+  box-shadow:
+    0 -8px 0 white,
+    0 8px 0 white;
+}
+
+/* Outer Menu Rectangle */
+.menu > div:not(.menu-closed) {
+  width: 140px;
+  padding: 8px;
+  box-sizing: border-box;
+  background: #eeeeee;
+  border: 1px solid #777777;
+  border-radius: 5px;
+  color: black;
+}
+
+/* Menu Options are Tiled Vertically */
+.menu-opened,
+.menu-sure {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Menu Buttons */
+.menu button {
+  width: 100%;
+  padding: 6px;
+  font: inherit;
+  font-size: 14px;
+  color: black;
+  background: white;
+  border: 1px solid #888888;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.menu button:hover {
+  background: #dddddd;
+}
+
+/* Confirmation text */
+.menu-sure h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.menu-sure h3 {
+  margin: 0 0 4px;
+  font-size: 12px;
+  font-weight: normal;
+}
+
+/* Saved and coming-soon messages */
+.menu h1 {
+  margin: 0 0 7px;
+  padding: 0;
+  font-size: 13px;
+  line-height: 1.2;
+  color: black;
+}
+
+/* Arrows for undo and redo */
+.menu-arrows {
+  display: flex;
+  gap: 6px;
+}
+
+.menu-arrows button {
+  flex: 1;
+  height: 30px;
+  padding: 0;
+  font-size: 18px;
+}
+
+.menu-arrow-left::before {
+  content: "←";
+}
+
+.menu-arrow-right::before {
+  content: "→";
+}
