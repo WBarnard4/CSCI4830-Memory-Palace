@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { Menu } from "./Menu.jsx"
+import { Idea } from "./Idea.jsx";
 
 export default function RoomScreen({ activeRoom, onGoHome }) {
   // state which stores ideas
@@ -42,6 +43,11 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
     }
     const url = URL.createObjectURL(file);
 
+    console.log(url);
+    // File is not found or popup is not active
+    if (!file || !popupPosition) {
+      return;
+    }
 
     // Image is a new idea
     if (imageInputTypeRef.current === "idea" && popupPosition) {
@@ -88,6 +94,21 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
     setPopupPosition(null);
   }
 
+  function updateIdea(newInfo) {
+    let current = [...ideas];
+    let index = current.findIndex(info => info.id === newInfo.id);
+    current[index] = newInfo;
+    setIdeas(current);
+  }
+
+  function deleteIdea(id) {
+    let current = [...ideas];
+    let index = current.findIndex(info => info.id === id);
+    if (index != -1) {
+      current.splice(index, 1);
+      setIdeas(current);
+    }
+  }
 
   // CORE CHANGE: The math for placing the idea
   const handleDoubleClick = (e) => {
@@ -101,13 +122,12 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
       return;
     }
 
-
-
     // Set the popup to the cursor position
     const rect = roomRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const x = (e.clientX / rect.width) * 100;
+    const y = (e.clientY / rect.height) * 100;
 
+    console.log(ideas);
     setPopupPosition({ x, y });
   };
 
@@ -119,6 +139,7 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
       onClick={closePopup}
       style={{
         backgroundImage: backgroundUrl === "none" ? "none" : `url("${backgroundUrl}")`,
+        backgroundSize: "cover",
         position: "relative", // Keeps absolute-positioned ideas inside this div
         overflow: "hidden",
       }}
@@ -157,8 +178,8 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
         <div
           style={{
             position: "absolute",
-            left: `${popupPosition.x}px`,
-            top: `${popupPosition.y}px`,
+            left: `${popupPosition.x}%`,
+            top: `${popupPosition.y}%`,
             transform: "translate(-50%, -50%)",
             backgroundColor: "white",
             border: "2px solid black",
@@ -183,38 +204,21 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
         </div>
       )}
 
-
       {/* CORE CHANGE: Drawing the ideas from our memory onto the screen */}
       {ideas.map((idea) => (
-        <div
-          key={idea.id}
-          style={{
-            position: "absolute",
-            left: `${idea.x}px`,
-            top: `${idea.y}px`,
-            transform: "translate(-50%, -50%)", // Centers the box on the mouse click
-            backgroundColor: "white",
-            padding: "10px",
-            border: "2px solid black",
-            borderRadius: "8px",
-            color: "black",
-            boxShadow: "0 4px 6px rgba(0,0,0,0.3)",
-          }}
-        >
-          {idea.text}
-
-          {idea.type === "image" && (
-            <img
-              src={idea.imageSrc}
-              alt="User idea"
-              style={{
-                width: "100px",
-                height: "100px",
-                objectFit: "contain",
-              }}
-            />
-          )}
-        </div>
+        <Idea 
+          id={idea.id}
+          type={idea.type}
+          x={idea.x}
+          y={idea.y}
+          text={idea.text}
+          imageSrc={idea.imageSrc}
+          updateIdea={updateIdea}
+          deleteIdea={deleteIdea}
+          imageInputRef={imageInputRef}
+          openImagePicker={openImagePicker}
+          key={idea.id}>
+        </Idea>
       ))}
     </div>
   );
