@@ -137,6 +137,8 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
         y: popupPosition.y,
         // text: url,
         imageSrc: url,
+        // HALO: new ideas start un-highlighted
+        highlighted: false,
       };
 
       setIdeas([...ideas, newIdea]);
@@ -167,6 +169,8 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
       x: popupPosition.x,
       y: popupPosition.y,
       text: "New Idea",
+      // HALO: new ideas start un-highlighted
+      highlighted: false,
     };
 
     setIdeas([...ideas, newIdea]);
@@ -278,6 +282,8 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
               y={idea.y}
               text={idea.text}
               imageSrc={idea.imageSrc}
+              // HALO: pass the flag down so Idea can render the glow
+              highlighted={idea.highlighted}
               updateIdea={updateIdea}
               deleteIdea={deleteIdea}
               imageInputRef={imageInputRef}
