@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Menu } from "./Menu.jsx"
+import { PathMenu } from "./PathMenu.jsx"
+import { PathNav } from "./PathNav.jsx"
 import { Idea } from "./Idea.jsx";
 
 const BASE_VIEWPORT_WIDTH = 1920;
@@ -11,6 +13,11 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
   const [popupPosition, setPopupPosition] = useState(null);
   const imageInputRef = useRef(null);
   const imageInputTypeRef = useRef("idea");
+
+  // order is just the ideas array order for now, no reordering yet
+  const [pathActive, setPathActive] = useState(false);
+  const [pathIndex, setPathIndex] = useState(0);
+
   const [backgroundUrl, setBackgroundUrl] = useState(() => {
     switch (activeRoom) {
       case "Bedroom":
@@ -107,7 +114,20 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
     };
   }, [backgroundDimensions]);
 
+  // clamp path state if ideas get added/deleted mid-walk
+  useEffect(() => {
+    if (!pathActive) return;
 
+    if (ideas.length === 0) {
+      setPathActive(false);
+      setPathIndex(0);
+      return;
+    }
+
+    if (pathIndex > ideas.length - 1) {
+      setPathIndex(ideas.length - 1);
+    }
+  }, [ideas, pathActive, pathIndex]);
 
   function openImagePicker(type) {
     imageInputTypeRef.current = type;
@@ -137,7 +157,6 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
         y: popupPosition.y,
         // text: url,
         imageSrc: url,
-        // HALO: new ideas start un-highlighted
         highlighted: false,
       };
 
@@ -169,7 +188,6 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
       x: popupPosition.x,
       y: popupPosition.y,
       text: "New Idea",
-      // HALO: new ideas start un-highlighted
       highlighted: false,
     };
 
@@ -192,6 +210,30 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
       setIdeas(current);
     }
   }
+
+  function startPath() {
+    if (ideas.length === 0) return;
+    setPathActive(true);
+    setPathIndex(0);
+  }
+
+  function stopPath() {
+    setPathActive(false);
+  }
+
+  function nextPathStep() {
+    setPathIndex((i) => Math.min(i + 1, ideas.length - 1));
+  }
+
+  function prevPathStep() {
+    setPathIndex((i) => Math.max(i - 1, 0));
+  }
+
+  // whichever idea the path is currently sitting on, if any
+  const currentPathId =
+    pathActive && ideas.length > 0
+      ? ideas[Math.min(pathIndex, ideas.length - 1)].id
+      : null;
 
   // CORE CHANGE: The math for placing the idea
   const handleDoubleClick = (e) => {
@@ -230,6 +272,20 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
           areChanges={() => true}
         />
       </div>
+
+      {/* path menu, top right - order is just insertion order for now */}
+      <div style={{ position: "relative", zIndex: 100 }}>
+        <PathMenu
+          ideas={ideas}
+          pathActive={pathActive}
+          pathIndex={pathIndex}
+          onStart={startPath}
+          onNext={nextPathStep}
+          onPrev={prevPathStep}
+          onStop={stopPath}
+        />
+      </div>
+
       {/* Wrapper div to make the browser layout treat a room as the correct size and allow popups to overflow*/}
       <div
         className="room-wrapper"
@@ -274,23 +330,32 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
           />
 
           {/* CORE CHANGE: Drawing the ideas from our memory onto the screen */}
-          {ideas.map((idea) => (
-            <Idea
-              id={idea.id}
-              type={idea.type}
-              x={idea.x}
-              y={idea.y}
-              text={idea.text}
-              imageSrc={idea.imageSrc}
-              // HALO: pass the flag down so Idea can render the glow
-              highlighted={idea.highlighted}
-              updateIdea={updateIdea}
-              deleteIdea={deleteIdea}
-              imageInputRef={imageInputRef}
-              openImagePicker={openImagePicker}
-              key={idea.id}>
-            </Idea>
-          ))}
+          {ideas.map((idea, index) => {
+            // highlighted (manual or path) always wins, otherwise earlier
+            // in the order sits above later ones
+            const isHighlighted = idea.highlighted || idea.id === currentPathId;
+            const baseZ = ideas.length - index;
+            const zIndex = isHighlighted ? 1000 + baseZ : baseZ;
+
+            return (
+              <Idea
+                id={idea.id}
+                type={idea.type}
+                x={idea.x}
+                y={idea.y}
+                text={idea.text}
+                imageSrc={idea.imageSrc}
+                highlighted={idea.highlighted}
+                pathHighlighted={idea.id === currentPathId}
+                zIndex={zIndex}
+                updateIdea={updateIdea}
+                deleteIdea={deleteIdea}
+                imageInputRef={imageInputRef}
+                openImagePicker={openImagePicker}
+                key={idea.id}>
+              </Idea>
+            );
+          })}
         </div>
 
         {/* Popup on double click */}
@@ -324,6 +389,16 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
           </div>
         )}
       </div>
+
+      {/* prev/next widget, bottom center so it doesn't fight with the two corner menus */}
+      {pathActive && (
+        <PathNav
+          pathIndex={pathIndex}
+          total={ideas.length}
+          onPrev={prevPathStep}
+          onNext={nextPathStep}
+        />
+      )}
     </div>
   );
 }

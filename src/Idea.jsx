@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 
-export function Idea({ id, type, x, y, text, imageSrc, highlighted, updateIdea, deleteIdea }) {
+export function Idea({ id, type, x, y, text, imageSrc, highlighted, pathHighlighted, zIndex, updateIdea, deleteIdea }) {
   const [active, setActive] = useState(false);
   const imageInputRef = useRef(null);
   const ideaInfo = {
@@ -10,16 +10,18 @@ export function Idea({ id, type, x, y, text, imageSrc, highlighted, updateIdea, 
     y: y,
     text: text,
     imageSrc: imageSrc,
-    // HALO: carry the flag so updates don't drop it
     highlighted: highlighted,
   };
+
+  // glow if manually highlighted OR the path is currently sitting on this one
+  const isHighlighted = ideaInfo.highlighted || pathHighlighted;
+
   console.log("Created");
 
   function handleClick() {
     setActive(!active);
   }
 
-  // HALO: flip the highlighted flag through the normal update path
   function toggleHighlight() {
     updateIdea({
       ...ideaInfo,
@@ -50,8 +52,6 @@ export function Idea({ id, type, x, y, text, imageSrc, highlighted, updateIdea, 
       y: Number(query1),
       text: query2,
       imageSrc: query3,
-      // HALO: preserve the flag when the form submits,
-      // otherwise editing an idea would silently un-highlight it
       highlighted: ideaInfo.highlighted,
     }
 
@@ -85,7 +85,6 @@ export function Idea({ id, type, x, y, text, imageSrc, highlighted, updateIdea, 
       y: ideaInfo.y,
       text: ideaInfo.text,
       imageSrc: url,
-      // HALO: preserve the flag on image changes too
       highlighted: ideaInfo.highlighted,
     }
     updateIdea(newInfo);
@@ -105,21 +104,18 @@ export function Idea({ id, type, x, y, text, imageSrc, highlighted, updateIdea, 
           transform: "translate(-50%, -50%)", // Centers the box on the mouse click
           backgroundColor: "white",
           padding: "10px",
-          // HALO: gold border when highlighted, black otherwise
-          border: ideaInfo.highlighted
+          border: isHighlighted
             ? "2px solid #ffd700"
             : "2px solid black",
           borderRadius: "8px",
           color: "black",
           cursor: "pointer",
-          // HALO: solid 4px ring + soft 24px outer bloom when highlighted
-          boxShadow: ideaInfo.highlighted
+          boxShadow: isHighlighted
             ? "0 0 0 4px rgba(255, 215, 0, 0.9), 0 0 24px 10px rgba(255, 215, 0, 0.55)"
             : "0 4px 6px rgba(0,0,0,0.3)",
-          // HALO: animate the glow in/out instead of snapping
           transition: "box-shadow 0.25s ease, border-color 0.25s ease",
-          // HALO: highlighted ideas render above normal ones
-          zIndex: ideaInfo.highlighted ? 5 : 1,
+          // z-index now comes from RoomScreen (order position + highlight state)
+          zIndex: zIndex ?? (isHighlighted ? 5 : 1),
         }}
       >
         {ideaInfo.text}
@@ -180,7 +176,6 @@ export function Idea({ id, type, x, y, text, imageSrc, highlighted, updateIdea, 
             <button type="button" onClick={openImagePicker}>Select Image</button>
             <br />
 
-            {/* HALO: highlight toggle lives in the per-idea menu */}
             <button type="button" onClick={toggleHighlight}>
               {ideaInfo.highlighted ? "Remove Highlight" : "Highlight"}
             </button>
