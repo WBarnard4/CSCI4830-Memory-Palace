@@ -1,0 +1,39 @@
+.path-nav {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #eeeeee;
+  border: 1px solid #777777;
+  border-radius: 24px;
+  padding: 8px 16px;
+  box-shadow: rgba(0, 0, 0, 0.1) 0 10px 15px -3px;
+}
+
+.path-nav button {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid #888888;
+  background: #dddddd;
+  color: black;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.path-nav button:hover,
+.path-nav button:active,
+.path-nav button:focus {
+  background: #dddddd;
+}
+
+.path-nav-label {
+  color: black;
+  font-size: 14px;
+  min-width: 48px;
+  text-align: center;
+}
