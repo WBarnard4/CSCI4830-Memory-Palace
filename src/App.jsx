@@ -7,7 +7,7 @@ const HOME_LOAD = 1;
 const HOME_NEW = 2;
 
 // 'RoomScreen.jsx' used for page 2 room logic under the primary if-statement
-import RoomScreen from "./RoomScreen.jsx";
+import RoomScreen from "@/model/room/RoomScreen.jsx";
 
 function App() {
   const [activeRoom, setActiveRoom] = useState(null);
