@@ -1,9 +1,20 @@
 import { useState, useRef, useEffect } from "react";
-import { Menu } from "./Menu.jsx"
-import { PathMenu } from "./PathMenu.jsx"
-import { PathNav } from "./PathNav.jsx"
-import { Idea } from "./Idea.jsx";
+import { Menu } from "@/model/menu/Menu.jsx"
+import { PathMenu } from "./path/PathMenu.jsx"
+import { PathNav } from "./path/PathNav.jsx"
+import { Idea } from "./idea/Idea.jsx";
 
+import bedroomUrl from "@/assets/generic_bedroom.jpg";
+import kitchenUrl from "@/assets/generic_kitchen.png";
+import livingRoomUrl from "@/assets/generic_living_room.jpg";
+import bathroomUrl from "@/assets/generic_bathroom.jpg";
+
+// Reformat to:
+//
+// const BASE_VIEWPORT_DIMENSIONS = {
+  // width: 1920,
+  // height: 1080,
+// }
 const BASE_VIEWPORT_WIDTH = 1920;
 const BASE_VIEWPORT_HEIGHT = 1080;
 
@@ -21,13 +32,13 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
   const [backgroundUrl, setBackgroundUrl] = useState(() => {
     switch (activeRoom) {
       case "Bedroom":
-        return 'src/assets/generic_bedroom.jpg';
+        return bedroomUrl;
       case "Kitchen":
-        return 'src/assets/generic_kitchen.png';
+        return kitchenUrl;
       case "Living Room":
-        return 'src/assets/generic_living_room.jpg';
+        return livingRoomUrl;
       case "Bathroom":
-        return 'src/assets/generic_bathroom.jpg';
+        return bathroomUrl;
       default:
         return 'none';
     }

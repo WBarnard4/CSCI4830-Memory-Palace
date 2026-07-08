@@ -62,17 +62,17 @@
 }
 
 .bedroom-button {
-  background-image: url("src/assets/generic_bedroom.jpg");
+  background-image: url("@/assets/generic_bedroom.jpg");
 }
 
 .living-room-button {
-  background-image: url("src/assets/generic_living_room.jpg");
+  background-image: url("@/assets/generic_living_room.jpg");
 }
 
 .kitchen-button {
-  background-image: url("src/assets/generic_kitchen.png");
+  background-image: url("@/assets/generic_kitchen.png");
 }
 
 .bathroom-button {
-  background-image: url("src/assets/generic_bathroom.jpg");
+  background-image: url("@/assets/generic_bathroom.jpg");
 }
