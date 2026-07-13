@@ -18,7 +18,7 @@ import bathroomUrl from "@/assets/generic_bathroom.jpg";
 const BASE_VIEWPORT_WIDTH = 1920;
 const BASE_VIEWPORT_HEIGHT = 1080;
 
-export default function RoomScreen({ activeRoom, onGoHome }) {
+export default function RoomScreen({ roomData, onGoHome, onGoLoad, onGoNew }) {
   // state which stores ideas
   const [ideas, setIdeas] = useState([]);
   const [popupPosition, setPopupPosition] = useState(null);
@@ -30,7 +30,8 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
   const [pathIndex, setPathIndex] = useState(0);
 
   const [backgroundUrl, setBackgroundUrl] = useState(() => {
-    switch (activeRoom) {
+    // TODO: set background using roomData.imgSrc instead of name
+    switch (roomData.name) {
       case "Bedroom":
         return bedroomUrl;
       case "Kitchen":
@@ -274,8 +275,8 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
       <div style={{ position: "relative", zIndex: 100 }}>
         <Menu
           saveRoom={() => null}
-          loadRoom={() => null}
-          newRoom={() => null}
+          loadRoom={onGoLoad}
+          newRoom={onGoNew}
           setBackgroundImage={() => openImagePicker("background")}
           undo={() => null}
           redo={() => null}
@@ -327,7 +328,7 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
         >
           {/* UI Layer: Kept on top with zIndex */}
           <div style={{ position: "relative", zIndex: 10 }}>
-            <h1>You are in the {activeRoom}</h1>
+            <h1>You are in the {roomData.name}</h1>
           </div>
 
           {/* File Explorer Popup for Image inputs */}

@@ -11,6 +11,8 @@ import HOME_STATES from "@/model/main-screens/States.jsx"
 // 'RoomScreen.jsx' used for page 2 room logic under the primary if-statement
 import RoomScreen from "@/model/room/RoomScreen.jsx";
 
+import RoomFactory from "@/utils/RoomFactory.jsx";
+
 function App() {
   const [activeRoom, setActiveRoom] = useState(null);
   const [homeState, setHomeState] = useState(HOME_STATES.MAIN);
@@ -20,11 +22,30 @@ function App() {
 
   /** 
    * Sets state back to MAIN and renders a RoomScreen based on the name.
-   * @param {string} room - Name of the Room, passed to setActiveRoom().
+   * @param {string} roomData - Name of the Room, passed to setActiveRoom().
   */
-  function handleRoomClick(room) {
+  function handleNewRoomClick(name, imgSrc) {
     setHomeState(HOME_STATES.MAIN);
-    setActiveRoom(room);
+    var roomData = {
+      name: name,
+      imgSrc: imgSrc,
+      type: "New"
+    }
+    setActiveRoom(roomData);
+  }
+
+  function handleTemplateRoomClick(name) {
+    setHomeState(HOME_STATES.MAIN);
+    var roomData = {
+      name: name,
+      type: "Template"
+    }
+    setActiveRoom(roomData)
+  }
+
+  function handleLoadRoomClick(data) {
+    setHomeState(HOME_STATES.MAIN);
+    setActiveRoom(data)
   }
 
   /**
@@ -36,6 +57,12 @@ function App() {
   }
 
 
+  function handleGoTo(screen) {
+    setActiveRoom(null);
+    setHomeState(screen);
+  }
+
+
   //IMPORTANT!
   //here we check if the activeRoom has a real value
   //if so, it displays a new screen with a sentence containing the value - this is a placeholder for page 2
@@ -43,8 +70,10 @@ function App() {
   if (activeRoom) {
     return (
       <RoomScreen
-        activeRoom={activeRoom}
-        onGoHome={() => handleRoomClick(null)}
+        roomData={activeRoom}
+        onGoHome={() => handleGoTo(HOME_STATES.MAIN)}
+        onGoLoad={() => handleGoTo(HOME_STATES.LOAD)}
+        onGoNew={() => handleGoTo(HOME_STATES.NEW)}
       />
     );
   }
@@ -64,12 +93,14 @@ function App() {
       {/* Create a new room */}
       <NewRoomScreen
         isOpen={homeState}
-        onClose={handleRoomClick} />
+        onClose={handleTemplateRoomClick}
+        onCloseNew={handleNewRoomClick} />
 
       {/* Load previously made rooms */}
       <LoadRoomScreen
         isOpen={homeState}
-        onClose={() => handleHomeMainClick(HOME_STATES.MAIN)} />
+        onClose={() => handleHomeMainClick(HOME_STATES.MAIN)}
+        onCloseLoad={handleLoadRoomClick} />
     </div>
   );
 }

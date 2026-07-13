@@ -138,7 +138,8 @@ export function Menu({ saveRoom, loadRoom, newRoom, setBackgroundImage, undo, re
 							onMouseLeave={() => setOpened(false)}
 						>
 							<button onClick={saveWithFeedback}>Save</button>
-							<button onClick={loadRoomComingSoon}>Load</button>
+							<button onClick={() => verifyWithPopup(loadRoom)}>Load</button>
+							{/* TODO: loadRoom and goHome work, but newRoom doesn't despite being implemented similarily*/}
 							<button onClick={() => verifyWithPopup(newRoom)}>New Room</button>
 							<button onClick={setBackgroundImage}>Change Background</button>
 							<div className="menu-arrows">

@@ -39,6 +39,18 @@ export default function NewRoomScreen({isOpen, onClose}) {
             >
                 Bathroom
             </button>
+
+            {/* TODO: Prompt for name and image source(open file explorer) */}
+            <button
+                className="room-button"
+                onClick={() => {
+                    var name;
+                    var imgSrc;
+                    onCloseNew(name, imgSrc);
+                }}
+            >
+                Add New Room
+            </button>
         </div>
     );
 }
