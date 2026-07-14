@@ -9,7 +9,7 @@ db.version(1).stores({
   changes: "++id, roomId, index", // for the undo/redo history
 });
 export async function saveImage(file) {
-    console.log("saveImage called with:", file.name);
+    //console.log("saveImage called with:", file.name);
   const id = await db.images.add({
     name: file.name,
     data: file, // File is a Blob — Dexie stores it as-is
@@ -24,9 +24,39 @@ export async function getImageUrl(imageId) {
   return URL.createObjectURL(record.data);
 }
 
+export async function createRoom(name, imageFile) {
+  return db.transaction("rw", db.images, db.rooms, async () => {
+    const imageId = imageFile ? await saveImage(imageFile) : null;
+    return db.rooms.add({ name, imageId });
+  });
+}
+export async function getAllRooms() {
+  return db.rooms.toArray();
+}
+
+export async function loadRoom(roomId) {
+  const room = await db.rooms.get(roomId);
+  if (!room) return null;
+
+  const ideas = await db.ideas.where("roomId").equals(roomId).toArray();
+  const imgSrc = room.imageId ? await getImageUrl(room.imageId) : null;
+
+  return {
+    id: room.id,
+    name: room.name,
+    imgSrc,
+    ideas,
+    type: "Load",
+  };
+}
+
+// TEMP: console access for testing — remove before PR
+window.dbTest = { db, createRoom, loadRoom };
+
 //URL.revokeObjectURL() may need to be called when the image is no longer needed, but this is not implemented yet. The URL will be revoked when the page is closed, so it is not a huge issue.
 
 // TEMP test — comment out after verifying
 //saveImage(new File(["hello"], "test.txt")).then((id) => console.log("saved image id:", id));
 
-window.db = db; // TEMP: lets us query from the browser console
+// TEMP: lets us query from the browser console - use "await db.images.toArray()" in console to see all images, or "await db.images.get(1)" to get the image with id 1, etc.
+window.db = db; 

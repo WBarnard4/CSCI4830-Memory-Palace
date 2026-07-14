@@ -1,14 +1,7 @@
 // return object containing Room data to be used in RoomFactory. Called by RoomFactory.
-export const LoadRoomData = (id) => {
-    // TODO: Load from database and fill into roomData
-    
-    var roomData = {
-        id: null,
-        name: "",
-        imgSrc: null,
-        ideas: {},
-        type: "Load"
-    }
+import { loadRoom } from "@/db/db.js";
 
-    return roomData;
-}
+export const LoadRoomData = async (id) => {
+  // Loads from database and fills into roomData shape
+  return await loadRoom(id);
+};
