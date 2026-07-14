@@ -13,6 +13,8 @@ import RoomScreen from "@/model/room/RoomScreen.jsx";
 
 import RoomFactory from "@/utils/RoomFactory.jsx";
 
+import { createRoom } from "@/db/db.js";
+
 function App() {
   const [activeRoom, setActiveRoom] = useState(null);
   const [homeState, setHomeState] = useState(HOME_STATES.MAIN);
@@ -24,23 +26,16 @@ function App() {
    * Sets state back to MAIN and renders a RoomScreen based on the name.
    * @param {string} roomData - Name of the Room, passed to setActiveRoom().
   */
-  function handleNewRoomClick(name, imgSrc) {
+  async function handleNewRoomClick(name, imgSrc) {
     setHomeState(HOME_STATES.MAIN);
-    var roomData = {
-      name: name,
-      imgSrc: imgSrc,
-      type: "New"
-    }
-    setActiveRoom(roomData);
+    const id = await createRoom(name);
+    setActiveRoom({ id, name, imgSrc, ideas: [], type: "New" });
   }
 
-  function handleTemplateRoomClick(name) {
+  async function handleTemplateRoomClick(name) {
     setHomeState(HOME_STATES.MAIN);
-    var roomData = {
-      name: name,
-      type: "Template"
-    }
-    setActiveRoom(roomData)
+    const id = await createRoom(name);
+    setActiveRoom({ id, name, ideas: [], type: "Template" });
   }
 
   function handleLoadRoomClick(data) {

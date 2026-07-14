@@ -21,7 +21,7 @@ const BASE_VIEWPORT_HEIGHT = 1080;
 
 export default function RoomScreen({ roomData, onGoHome, onGoLoad, onGoNew }) {
   // state which stores ideas
-  const [ideas, setIdeas] = useState([]);
+  const [ideas, setIdeas] = useState(roomData.ideas ?? []);
   const [popupPosition, setPopupPosition] = useState(null);
   const imageInputRef = useRef(null);
   const imageInputTypeRef = useRef("idea");
