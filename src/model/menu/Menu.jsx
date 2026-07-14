@@ -125,9 +125,7 @@ export function Menu({ saveRoom, loadRoom, newRoom, setBackgroundImage, undo, re
 					)}
 
 					{areYouSurePopup ? (
-						<div className="menu-sure"
-							onBlur={() => areYouSureNo()}
-						>
+						<div className="menu-sure">
 							<h2>Are you sure?</h2>
 							<h3>Data may be lost</h3>
 							<button onClick={areYouSureNo}>No</button>
@@ -139,7 +137,6 @@ export function Menu({ saveRoom, loadRoom, newRoom, setBackgroundImage, undo, re
 						>
 							<button onClick={saveWithFeedback}>Save</button>
 							<button onClick={() => verifyWithPopup(loadRoom)}>Load</button>
-							{/* TODO: loadRoom and goHome work, but newRoom doesn't despite being implemented similarily*/}
 							<button onClick={() => verifyWithPopup(newRoom)}>New Room</button>
 							<button onClick={setBackgroundImage}>Change Background</button>
 							<div className="menu-arrows">
