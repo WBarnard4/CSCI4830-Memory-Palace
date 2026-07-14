@@ -3,6 +3,7 @@ import { Menu } from "@/model/menu/Menu.jsx"
 import { PathMenu } from "./path/PathMenu.jsx"
 import { PathNav } from "./path/PathNav.jsx"
 import { Idea } from "./idea/Idea.jsx";
+import { saveImage } from "@/db/db.js";
 
 import bedroomUrl from "@/assets/generic_bedroom.jpg";
 import kitchenUrl from "@/assets/generic_kitchen.png";
@@ -146,7 +147,7 @@ export default function RoomScreen({ roomData, onGoHome, onGoLoad, onGoNew }) {
     imageInputRef.current.click();
   }
 
-  function handleImageSelected(a) {
+  async function handleImageSelected(a) {
 
     // TODO: Change to persistent storage (IndexDB)
     const file = a.target.files[0];
@@ -156,9 +157,10 @@ export default function RoomScreen({ roomData, onGoHome, onGoLoad, onGoNew }) {
       return;
 
     }
+    const imageId = await saveImage(file);
     const url = URL.createObjectURL(file);
 
-    console.log(url);
+   // console.log(url);
 
     // Image is a new idea
     if (imageInputTypeRef.current === "idea" && popupPosition) {
@@ -167,6 +169,7 @@ export default function RoomScreen({ roomData, onGoHome, onGoLoad, onGoNew }) {
         type: "image",
         x: popupPosition.x,
         y: popupPosition.y,
+        imageId: imageId,
         // text: url,
         imageSrc: url,
         highlighted: false,
