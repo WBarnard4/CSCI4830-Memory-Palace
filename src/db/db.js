@@ -49,6 +49,17 @@ export async function loadRoom(roomId) {
     type: "Load",
   };
 }
+export async function saveIdea(idea, roomId) {
+  const dbId = await db.ideas.add({
+    roomId,
+    type: idea.type,
+    x: idea.x,
+    y: idea.y,
+    text: idea.text ?? null,
+    imageId: idea.imageId ?? null,
+  });
+  return dbId;
+}
 
 // TEMP: console access for testing — remove before PR
 window.dbTest = { db, createRoom, loadRoom };

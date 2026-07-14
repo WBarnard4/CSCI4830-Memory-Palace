@@ -3,7 +3,7 @@ import { Menu } from "@/model/menu/Menu.jsx"
 import { PathMenu } from "./path/PathMenu.jsx"
 import { PathNav } from "./path/PathNav.jsx"
 import { Idea } from "./idea/Idea.jsx";
-import { saveImage } from "@/db/db.js";
+import { saveImage, saveIdea, getImageUrl } from "@/db/db.js";
 
 import bedroomUrl from "@/assets/generic_bedroom.jpg";
 import kitchenUrl from "@/assets/generic_kitchen.png";
@@ -82,6 +82,20 @@ export default function RoomScreen({ roomData, onGoHome, onGoLoad, onGoNew }) {
     // Load the image as the background image
     image.src = backgroundUrl;
   }, [backgroundUrl]);
+// On mount: loaded image ideas have dead session URLs — mint fresh ones from their stored blobs
+    useEffect(() => {
+      async function refreshImageUrls() {
+        const refreshed = await Promise.all(
+          ideas.map(async (idea) => {
+            if (idea.type !== "image" || !idea.imageId) return idea;
+            const freshUrl = await getImageUrl(idea.imageId);
+            return { ...idea, imageSrc: freshUrl };
+          })
+        );
+        setIdeas(refreshed);
+      }
+      refreshImageUrls();
+    }, []); // empty array = run once, when the room opens
 
   // Recalculate the room dimensions on background or window dimension changes.
   useEffect(() => {
@@ -174,6 +188,8 @@ export default function RoomScreen({ roomData, onGoHome, onGoLoad, onGoNew }) {
         imageSrc: url,
         highlighted: false,
       };
+      const dbId = await saveIdea(newIdea, roomData.id);
+        newIdea.dbId = dbId;
 
       setIdeas([...ideas, newIdea]);
       setPopupPosition(null);
@@ -192,7 +208,7 @@ export default function RoomScreen({ roomData, onGoHome, onGoLoad, onGoNew }) {
     setPopupPosition(null);
   }
 
-  function addTextIdea() {
+  async function addTextIdea() {
     if (!popupPosition) {
       return;
     }
@@ -206,9 +222,12 @@ export default function RoomScreen({ roomData, onGoHome, onGoLoad, onGoNew }) {
       highlighted: false,
     };
 
-    setIdeas([...ideas, newIdea]);
-    setPopupPosition(null);
-  }
+  const dbId = await saveIdea(newIdea, roomData.id);
+  newIdea.dbId = dbId;
+
+  setIdeas([...ideas, newIdea]);
+  setPopupPosition(null);
+}
 
   function updateIdea(newInfo) {
     let current = [...ideas];
