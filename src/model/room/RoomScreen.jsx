@@ -10,14 +10,10 @@ import kitchenUrl from "@/assets/generic_kitchen.png";
 import livingRoomUrl from "@/assets/generic_living_room.jpg";
 import bathroomUrl from "@/assets/generic_bathroom.jpg";
 
-// Reformat to:
-//
-// const BASE_VIEWPORT_DIMENSIONS = {
-  // width: 1920,
-  // height: 1080,
-// }
-const BASE_VIEWPORT_WIDTH = 1920;
-const BASE_VIEWPORT_HEIGHT = 1080;
+const BASE_VIEWPORT_DIMENSIONS = {
+  width: 1920,
+  height: 1080,
+}
 
 export default function RoomScreen({ roomData, onGoHome, onGoLoad, onGoNew }) {
   // state which stores ideas
@@ -82,20 +78,20 @@ export default function RoomScreen({ roomData, onGoHome, onGoLoad, onGoNew }) {
     // Load the image as the background image
     image.src = backgroundUrl;
   }, [backgroundUrl]);
-// On mount: loaded image ideas have dead session URLs — mint fresh ones from their stored blobs
-    useEffect(() => {
-      async function refreshImageUrls() {
-        const refreshed = await Promise.all(
-          ideas.map(async (idea) => {
-            if (idea.type !== "image" || !idea.imageId) return idea;
-            const freshUrl = await getImageUrl(idea.imageId);
-            return { ...idea, imageSrc: freshUrl };
-          })
-        );
-        setIdeas(refreshed);
-      }
-      refreshImageUrls();
-    }, []); // empty array = run once, when the room opens
+  // On mount: loaded image ideas have dead session URLs — mint fresh ones from their stored blobs
+  useEffect(() => {
+    async function refreshImageUrls() {
+      const refreshed = await Promise.all(
+        ideas.map(async (idea) => {
+          if (idea.type !== "image" || !idea.imageId) return idea;
+          const freshUrl = await getImageUrl(idea.imageId);
+          return { ...idea, imageSrc: freshUrl };
+        })
+      );
+      setIdeas(refreshed);
+    }
+    refreshImageUrls();
+  }, []); // empty array = run once, when the room opens
 
   // Recalculate the room dimensions on background or window dimension changes.
   useEffect(() => {
@@ -114,8 +110,8 @@ export default function RoomScreen({ roomData, onGoHome, onGoLoad, onGoNew }) {
     function updateRoomDimensions() {
       // Find the dimensions in the baseline viewport.
       const newBaseRoomDimensions = getContainedDimensions(
-        BASE_VIEWPORT_WIDTH,
-        BASE_VIEWPORT_HEIGHT
+        BASE_VIEWPORT_DIMENSIONS.width,
+        BASE_VIEWPORT_DIMENSIONS.height
       );
 
       // Find the dimensions in the current viewport.
@@ -163,7 +159,7 @@ export default function RoomScreen({ roomData, onGoHome, onGoLoad, onGoNew }) {
 
   async function handleImageSelected(a) {
 
-  
+
     const file = a.target.files[0];
 
     // File is not found
@@ -174,7 +170,7 @@ export default function RoomScreen({ roomData, onGoHome, onGoLoad, onGoNew }) {
     const imageId = await saveImage(file);
     const url = URL.createObjectURL(file);
 
-   // console.log(url);
+    // console.log(url);
 
     // Image is a new idea
     if (imageInputTypeRef.current === "idea" && popupPosition) {
@@ -187,7 +183,7 @@ export default function RoomScreen({ roomData, onGoHome, onGoLoad, onGoNew }) {
         imageSrc: url,
         highlighted: false,
       };
-     
+
 
       setIdeas([...ideas, newIdea]);
       setPopupPosition(null);
@@ -200,9 +196,9 @@ export default function RoomScreen({ roomData, onGoHome, onGoLoad, onGoNew }) {
 
   }
 
-   async function handleSave() {
-     const roomId = await saveRoom(roomData, ideas);
-     roomData.id = roomId; // first save: room now has a DB identity; re-saves reuse it
+  async function handleSave() {
+    const roomId = await saveRoom(roomData, ideas);
+    roomData.id = roomId; // first save: room now has a DB identity; re-saves reuse it
   }
 
   function closePopup() {
@@ -225,9 +221,9 @@ export default function RoomScreen({ roomData, onGoHome, onGoLoad, onGoNew }) {
 
 
 
-  setIdeas([...ideas, newIdea]);
-  setPopupPosition(null);
-}
+    setIdeas([...ideas, newIdea]);
+    setPopupPosition(null);
+  }
 
   function updateIdea(newInfo) {
     let current = [...ideas];
@@ -386,7 +382,7 @@ export default function RoomScreen({ roomData, onGoHome, onGoLoad, onGoNew }) {
                 deleteIdea={deleteIdea}
                 imageInputRef={imageInputRef}
                 openImagePicker={openImagePicker}
-                key={idea.id}>  
+                key={idea.id}>
               </Idea>
             );
           })}
