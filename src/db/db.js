@@ -33,7 +33,34 @@ export async function createRoom(name, imageFile) {
 export async function getAllRooms() {
   return db.rooms.toArray();
 }
+export async function saveRoom(roomData, ideas) {
+  return db.transaction("rw", db.rooms, db.ideas, db.images, async () => {
+    let roomId = roomData.id;
 
+    // First save: room doesn't exist in the DB yet
+    if (roomId == null) {
+      roomId = await db.rooms.add({
+        name: roomData.name,
+        imageId: roomData.imageId ?? null,
+      });
+    }
+
+    // Sync ideas: wipe this room's old records, rewrite from current state
+    await db.ideas.where("roomId").equals(roomId).delete();
+    for (const idea of ideas) {
+      await db.ideas.add({
+        roomId,
+        type: idea.type,
+        x: idea.x,
+        y: idea.y,
+        text: idea.text ?? null,
+        imageId: idea.imageId ?? null,
+      });
+    }
+
+    return roomId;
+  });
+}
 export async function loadRoom(roomId) {
   const room = await db.rooms.get(roomId);
   if (!room) return null;
@@ -63,6 +90,7 @@ export async function saveIdea(idea, roomId) {
 
 // TEMP: console access for testing — remove before PR
 window.dbTest = { db, createRoom, loadRoom };
+window.dbTest = { db, saveRoom };
 
 //URL.revokeObjectURL() may need to be called when the image is no longer needed, but this is not implemented yet. The URL will be revoked when the page is closed, so it is not a huge issue.
 

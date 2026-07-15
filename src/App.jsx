@@ -26,16 +26,14 @@ function App() {
    * Sets state back to MAIN and renders a RoomScreen based on the name.
    * @param {string} roomData - Name of the Room, passed to setActiveRoom().
   */
-  async function handleNewRoomClick(name, imgSrc) {
+  function handleNewRoomClick(name, imgSrc) {
     setHomeState(HOME_STATES.MAIN);
-    const id = await createRoom(name);
-    setActiveRoom({ id, name, imgSrc, ideas: [], type: "New" });
+    setActiveRoom({ id: null, name, imgSrc, ideas: [], type: "New" });
   }
 
-  async function handleTemplateRoomClick(name) {
+  function handleTemplateRoomClick(name) {
     setHomeState(HOME_STATES.MAIN);
-    const id = await createRoom(name);
-    setActiveRoom({ id, name, ideas: [], type: "Template" });
+    setActiveRoom({ id: null, name, ideas: [], type: "Template" });
   }
 
   function handleLoadRoomClick(data) {

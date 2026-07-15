@@ -3,7 +3,7 @@ import { Menu } from "@/model/menu/Menu.jsx"
 import { PathMenu } from "./path/PathMenu.jsx"
 import { PathNav } from "./path/PathNav.jsx"
 import { Idea } from "./idea/Idea.jsx";
-import { saveImage, saveIdea, getImageUrl } from "@/db/db.js";
+import { saveImage, getImageUrl, saveRoom } from "@/db/db.js";
 
 import bedroomUrl from "@/assets/generic_bedroom.jpg";
 import kitchenUrl from "@/assets/generic_kitchen.png";
@@ -188,8 +188,7 @@ export default function RoomScreen({ roomData, onGoHome, onGoLoad, onGoNew }) {
         imageSrc: url,
         highlighted: false,
       };
-      const dbId = await saveIdea(newIdea, roomData.id);
-        newIdea.dbId = dbId;
+     
 
       setIdeas([...ideas, newIdea]);
       setPopupPosition(null);
@@ -202,7 +201,10 @@ export default function RoomScreen({ roomData, onGoHome, onGoLoad, onGoNew }) {
 
   }
 
-
+   async function handleSave() {
+     const roomId = await saveRoom(roomData, ideas);
+     roomData.id = roomId; // first save: room now has a DB identity; re-saves reuse it
+  }
 
   function closePopup() {
     setPopupPosition(null);
@@ -222,8 +224,7 @@ export default function RoomScreen({ roomData, onGoHome, onGoLoad, onGoNew }) {
       highlighted: false,
     };
 
-  const dbId = await saveIdea(newIdea, roomData.id);
-  newIdea.dbId = dbId;
+
 
   setIdeas([...ideas, newIdea]);
   setPopupPosition(null);
@@ -296,7 +297,7 @@ export default function RoomScreen({ roomData, onGoHome, onGoLoad, onGoNew }) {
       {/* TODO: Add saving, loading, creating, and change reporting. */}
       <div style={{ position: "relative", zIndex: 100 }}>
         <Menu
-          saveRoom={() => null}
+          saveRoom={handleSave}
           loadRoom={onGoLoad}
           newRoom={onGoNew}
           setBackgroundImage={() => openImagePicker("background")}
@@ -386,7 +387,7 @@ export default function RoomScreen({ roomData, onGoHome, onGoLoad, onGoNew }) {
                 deleteIdea={deleteIdea}
                 imageInputRef={imageInputRef}
                 openImagePicker={openImagePicker}
-                key={idea.id}>
+                key={idea.id}>  
               </Idea>
             );
           })}
