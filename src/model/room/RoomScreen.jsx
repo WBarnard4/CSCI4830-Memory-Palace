@@ -293,7 +293,7 @@ export default function RoomScreen({ roomData, onGoHome, onGoLoad, onGoNew }) {
   return (
     <div className="room-viewport">
       {/* Menu Icon that implements most room switching and saving features */}
-      {/* TODO: Add saving, loading, creating, and change reporting. */}
+      {/* TODO: Add change reporting. */}
       <div style={{ position: "relative", zIndex: 100 }}>
         <Menu
           saveRoom={handleSave}

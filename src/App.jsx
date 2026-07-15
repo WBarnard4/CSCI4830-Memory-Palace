@@ -13,7 +13,7 @@ import RoomScreen from "@/model/room/RoomScreen.jsx";
 
 import RoomFactory from "@/utils/RoomFactory.jsx";
 
-import { createRoom } from "@/db/db.js";
+
 
 function App() {
   const [activeRoom, setActiveRoom] = useState(null);
