@@ -163,7 +163,7 @@ export default function RoomScreen({ roomData, onGoHome, onGoLoad, onGoNew }) {
 
   async function handleImageSelected(a) {
 
-    // TODO: Change to persistent storage (IndexDB)
+  
     const file = a.target.files[0];
 
     // File is not found
@@ -184,7 +184,6 @@ export default function RoomScreen({ roomData, onGoHome, onGoLoad, onGoNew }) {
         x: popupPosition.x,
         y: popupPosition.y,
         imageId: imageId,
-        // text: url,
         imageSrc: url,
         highlighted: false,
       };

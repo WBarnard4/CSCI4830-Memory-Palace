@@ -76,26 +76,11 @@ export async function loadRoom(roomId) {
     type: "Load",
   };
 }
-export async function saveIdea(idea, roomId) {
-  const dbId = await db.ideas.add({
-    roomId,
-    type: idea.type,
-    x: idea.x,
-    y: idea.y,
-    text: idea.text ?? null,
-    imageId: idea.imageId ?? null,
-  });
-  return dbId;
-}
 
-// TEMP: console access for testing — remove before PR
-window.dbTest = { db, createRoom, loadRoom };
-window.dbTest = { db, saveRoom };
 
 //URL.revokeObjectURL() may need to be called when the image is no longer needed, but this is not implemented yet. The URL will be revoked when the page is closed, so it is not a huge issue.
 
-// TEMP test — comment out after verifying
-//saveImage(new File(["hello"], "test.txt")).then((id) => console.log("saved image id:", id));
+
 
 // TEMP: lets us query from the browser console - use "await db.images.toArray()" in console to see all images, or "await db.images.get(1)" to get the image with id 1, etc.
 window.db = db; 

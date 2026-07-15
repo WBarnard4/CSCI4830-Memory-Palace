@@ -6,15 +6,17 @@ import { getAllRooms } from "@/db/db.js";
 const STATES = HOME_STATES;
 
 export default function LoadRoomScreen({isOpen, onClose, onCloseLoad}) {
-    // If state is incorrect, do not render component
-    if (isOpen != HOME_STATES.LOAD) return null;
   const [rooms, setRooms] = useState([]);
 
-useEffect(() => {
-  if (isOpen !== STATES.LOAD) return; // only fetch when this screen is actually showing
-  getAllRooms().then(setRooms);
-}, [isOpen]);
-   async function exportRoomData(id) {
+  useEffect(() => {
+    if (isOpen !== STATES.LOAD) return; // only fetch when this screen is showing
+    getAllRooms().then(setRooms);
+  }, [isOpen]);
+
+  // If state is incorrect, do not render component
+  if (isOpen != HOME_STATES.LOAD) return null;
+
+  async function exportRoomData(id)  {
   const roomData = await LoadRoomData(id);
   if (!roomData) return; // stale or missing id — do nothing rather than open a broken room
   onCloseLoad(roomData);
