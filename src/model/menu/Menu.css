@@ -51,6 +51,20 @@
   gap: 6px;
 }
 
+
+.menu-name-input {
+	width: 100%;
+	box-sizing: border-box;
+	margin: 0 0 7px;
+	padding: 5px;
+	font: inherit;
+	font-size: 13px;
+	color: black;
+	background: white;
+	border: 1px solid #888888;
+	border-radius: 3px;
+}
+
 /* Menu Buttons */
 .menu button {
   width: 100%;

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import "./Menu.css";
 
-export function Menu({ saveRoom, loadRoom, newRoom, setBackgroundImage, undo, redo, goHome, areChanges }) {
+export function Menu({ menuName, updateMenuName, saveRoom, loadRoom, newRoom, setBackgroundImage, undo, redo, goHome, areChanges }) {
 	const [opened, setOpened] = useState(false);
 	const [areYouSurePopup, setAreYouSurePopup] = useState(false);
 	const [sureCallback, setSureCallback] = useState(null);
@@ -108,6 +108,24 @@ export function Menu({ saveRoom, loadRoom, newRoom, setBackgroundImage, undo, re
 		};
 	}, [comingSoon]);
 
+	function newNameEntered(event) {
+		function isValidRoomName(value) {
+			return /^[A-Za-z0-9 _&*]+$/.test(value);
+		}
+
+		if (event.key != "Enter") {
+			return;
+		}
+
+		if (!isValidRoomName(event.target.value)) {
+			event.target.value = menuName;
+			return;
+		}
+
+		updateMenuName(event.target.value);
+		event.target.blur();
+	}
+
 	return (
 		<div
 			className="menu"
@@ -135,6 +153,13 @@ export function Menu({ saveRoom, loadRoom, newRoom, setBackgroundImage, undo, re
 						<div className="menu-opened"
 							onMouseLeave={() => setOpened(false)}
 						>
+							<input
+								key={menuName}
+								className="menu-name-input"
+								type="text"
+								defaultValue={menuName}
+								onKeyDown={newNameEntered}
+							/>
 							<button onClick={saveWithFeedback}>Save</button>
 							<button onClick={() => verifyWithPopup(loadRoom)}>Load</button>
 							<button onClick={() => verifyWithPopup(newRoom)}>New Room</button>

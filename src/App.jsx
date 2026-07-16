@@ -55,6 +55,17 @@ function App() {
     setHomeState(screen);
   }
 
+  function updateActiveRoom(changes) {
+    setActiveRoom((loadedRoom) => {
+      if (loadedRoom === null) {
+        return;
+      }
+      return { ...loadedRoom, ...changes };
+    })
+
+
+    // TODO: Update in DB
+  }
 
   //IMPORTANT!
   //here we check if the activeRoom has a real value
@@ -64,6 +75,7 @@ function App() {
     return (
       <RoomScreen
         roomData={activeRoom}
+        updateRoomData={updateActiveRoom}
         onGoHome={() => handleGoTo(HOME_STATES.MAIN)}
         onGoLoad={() => handleGoTo(HOME_STATES.LOAD)}
         onGoNew={() => handleGoTo(HOME_STATES.NEW)}

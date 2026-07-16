@@ -15,7 +15,7 @@ const BASE_VIEWPORT_DIMENSIONS = {
   height: 1080,
 }
 
-export default function RoomScreen({ roomData, onGoHome, onGoLoad, onGoNew }) {
+export default function RoomScreen({ roomData, updateRoomData, onGoHome, onGoLoad, onGoNew }) {
   // state which stores ideas
   const [ideas, setIdeas] = useState(roomData.ideas ?? []);
   const [popupPosition, setPopupPosition] = useState(null);
@@ -56,7 +56,7 @@ export default function RoomScreen({ roomData, onGoHome, onGoLoad, onGoNew }) {
   });
   const [roomScale, setRoomScale] = useState(1);
 
-  // CORE CHANGE: Reference to calculate boundaries
+  // Reference for calculating boundaries
   const roomRef = useRef(null);
 
   // Sets the background dimensions to match the background image whenever the background changes.
@@ -286,6 +286,10 @@ export default function RoomScreen({ roomData, onGoHome, onGoLoad, onGoNew }) {
     setPopupPosition({ x, y });
   };
 
+  function updateRoomName(name) {
+    updateRoomData({name: name});
+  }
+
   return (
     <div className="room-viewport">
       {/* Menu Icon that implements most room switching and saving features */}
@@ -300,6 +304,8 @@ export default function RoomScreen({ roomData, onGoHome, onGoLoad, onGoNew }) {
           redo={() => null}
           goHome={onGoHome}
           areChanges={() => true}
+          menuName={roomData.name}
+          updateMenuName={updateRoomName}
         />
       </div>
 
@@ -344,11 +350,6 @@ export default function RoomScreen({ roomData, onGoHome, onGoLoad, onGoNew }) {
 
           }}
         >
-          {/* UI Layer: Kept on top with zIndex */}
-          <div style={{ position: "relative", zIndex: 10 }}>
-            <h1>You are in the {roomData.name}</h1>
-          </div>
-
           {/* File Explorer Popup for Image inputs */}
           <input
             onClick={(e) => e.stopPropagation()}
