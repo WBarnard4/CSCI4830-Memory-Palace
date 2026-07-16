@@ -60,13 +60,14 @@ function App() {
   */
   function handleNewRoomClick(name, imgSrc) {
     setHomeState(HOME_STATES.MAIN);
-    setActiveRoom({ id: null, name, imgSrc, ideas: [], type: "New" });
+    setActiveRoom({ id: null, name, imgSrc: imgSrc, ideas: [], type: "New" });
   }
 
-  function handleTemplateRoomClick(name, imgSrc) {
-    setHomeState(HOME_STATES.MAIN);
-    setActiveRoom({ id: null, name, imgSrc: imgSrc, ideas: [], type: "Template" });
-  }
+  // NOTE: Unsure what type is used for, but new room logic is adjusted to always have "New" information.
+  // function handleTemplateRoomClick(name, imgSrc) {
+  //   setHomeState(HOME_STATES.MAIN);
+  //   setActiveRoom({ id: null, name, imgSrc: imgSrc, ideas: [], type: "Template" });
+  // }
 
   function handleLoadRoomClick(data) {
     setHomeState(HOME_STATES.MAIN);
@@ -132,8 +133,9 @@ function App() {
         {/* Create a new room */}
         <NewRoomScreen
           isOpen={homeState}
-          onClose={handleTemplateRoomClick}
-          onCloseNew={handleNewRoomClick} />
+          onClose={handleNewRoomClick}
+          onGoHome={() => handleHomeMainClick(HOME_STATES.MAIN)}
+          openImagePicker={openImagePicker} />
 
         {/* Load previously made rooms */}
         <LoadRoomScreen

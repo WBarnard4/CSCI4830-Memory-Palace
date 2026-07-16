@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { isValidRoomName } from "@/utils/RoomValidation";
 import "./Menu.css";
 
 export function Menu({ menuName, updateMenuName, saveRoom, loadRoom, newRoom, setBackgroundImage, undo, redo, goHome, areChanges }) {
@@ -68,16 +69,6 @@ export function Menu({ menuName, updateMenuName, saveRoom, loadRoom, newRoom, se
 	}, [showSavedPopup]);
 
 	/**
-	 * Verifies no data is overwritten before calling the loadRoom argument
-	 * Placeholder until the loadRoom argument is implemented;
-	 *
-	 * Feature coming soon TODO: Implement
-	 */
-	function loadRoomComingSoon() {
-		setComingSoon(true);
-	}
-
-	/**
 	 * Placeholder until the undo argument is implemented.
 	 *
 	 * Feature coming soon TODO: Implement
@@ -109,10 +100,6 @@ export function Menu({ menuName, updateMenuName, saveRoom, loadRoom, newRoom, se
 	}, [comingSoon]);
 
 	function newNameEntered(event) {
-		function isValidRoomName(value) {
-			return /^[A-Za-z0-9 _&*]+$/.test(value);
-		}
-
 		if (event.key != "Enter") {
 			return;
 		}
