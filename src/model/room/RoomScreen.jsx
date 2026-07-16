@@ -3,44 +3,22 @@ import { Menu } from "@/model/menu/Menu.jsx"
 import { PathMenu } from "./path/PathMenu.jsx"
 import { PathNav } from "./path/PathNav.jsx"
 import { Idea } from "./idea/Idea.jsx";
-import { saveImage, getImageUrl, saveRoom } from "@/db/db.js";
-
-import bedroomUrl from "@/assets/generic_bedroom.jpg";
-import kitchenUrl from "@/assets/generic_kitchen.png";
-import livingRoomUrl from "@/assets/generic_living_room.jpg";
-import bathroomUrl from "@/assets/generic_bathroom.jpg";
+import { getImageUrl, saveRoom } from "@/db/db.js";
 
 const BASE_VIEWPORT_DIMENSIONS = {
   width: 1920,
   height: 1080,
 }
 
-export default function RoomScreen({ roomData, updateRoomData, onGoHome, onGoLoad, onGoNew }) {
+export default function RoomScreen({ roomData, updateRoomData, openImagePicker, onGoHome, onGoLoad, onGoNew }) {
   // state which stores ideas
   const [ideas, setIdeas] = useState(roomData.ideas ?? []);
   const [popupPosition, setPopupPosition] = useState(null);
-  const imageInputRef = useRef(null);
-  const imageInputTypeRef = useRef("idea");
 
   // order is just the ideas array order for now, no reordering yet
   const [pathActive, setPathActive] = useState(false);
   const [pathIndex, setPathIndex] = useState(0);
 
-  const [backgroundUrl, setBackgroundUrl] = useState(() => {
-    // TODO: set background using roomData.imgSrc instead of name
-    switch (roomData.name) {
-      case "Bedroom":
-        return bedroomUrl;
-      case "Kitchen":
-        return kitchenUrl;
-      case "Living Room":
-        return livingRoomUrl;
-      case "Bathroom":
-        return bathroomUrl;
-      default:
-        return 'none';
-    }
-  })
   const [backgroundDimensions, setBackgroundDimensions] = useState({
     width: 1920,
     height: 1080,
@@ -61,13 +39,12 @@ export default function RoomScreen({ roomData, updateRoomData, onGoHome, onGoLoa
 
   // Sets the background dimensions to match the background image whenever the background changes.
   useEffect(() => {
-    if (backgroundUrl === "none") {
+    if (!roomData.imgSrc || roomData.imgSrc === "none") {
       return;
     }
 
     const image = new Image();
 
-    // When the image loads, set the background dimensions to it.
     image.onload = () => {
       setBackgroundDimensions({
         width: image.naturalWidth,
@@ -75,9 +52,40 @@ export default function RoomScreen({ roomData, updateRoomData, onGoHome, onGoLoa
       });
     };
 
-    // Load the image as the background image
-    image.src = backgroundUrl;
-  }, [backgroundUrl]);
+    image.src = roomData.imgSrc;
+  }, [roomData.imgSrc]);
+
+  function pickBackgroundImage() {
+    openImagePicker(({ imageId, imageSrc }) => {
+      updateRoomData({
+        imgSrc: imageSrc,
+        backgroundImageId: imageId,
+      });
+    });
+  }
+
+  function pickIdeaImage() {
+    if (!popupPosition) {
+      return;
+    }
+
+    const currentPopupPosition = popupPosition;
+
+    openImagePicker(({ imageId, imageSrc }) => {
+      const newIdea = {
+        id: Date.now(),
+        type: "image",
+        x: currentPopupPosition.x,
+        y: currentPopupPosition.y,
+        imageId: imageId,
+        imageSrc: imageSrc,
+        highlighted: false,
+      };
+
+      setIdeas((currentIdeas) => [...currentIdeas, newIdea]);
+      setPopupPosition(null);
+    });
+  }
   // On mount: loaded image ideas have dead session URLs — mint fresh ones from their stored blobs
   useEffect(() => {
     async function refreshImageUrls() {
@@ -151,50 +159,6 @@ export default function RoomScreen({ roomData, updateRoomData, onGoHome, onGoLoa
       setPathIndex(ideas.length - 1);
     }
   }, [ideas, pathActive, pathIndex]);
-
-  function openImagePicker(type) {
-    imageInputTypeRef.current = type;
-    imageInputRef.current.click();
-  }
-
-  async function handleImageSelected(a) {
-
-
-    const file = a.target.files[0];
-
-    // File is not found
-    if (!file) {
-      return;
-
-    }
-    const imageId = await saveImage(file);
-    const url = URL.createObjectURL(file);
-
-    // console.log(url);
-
-    // Image is a new idea
-    if (imageInputTypeRef.current === "idea" && popupPosition) {
-      const newIdea = {
-        id: Date.now(),
-        type: "image",
-        x: popupPosition.x,
-        y: popupPosition.y,
-        imageId: imageId,
-        imageSrc: url,
-        highlighted: false,
-      };
-
-
-      setIdeas([...ideas, newIdea]);
-      setPopupPosition(null);
-    } else if (imageInputTypeRef.current === "background") {
-      setBackgroundUrl(url);
-    }
-
-
-    a.target.value = "";
-
-  }
 
   async function handleSave() {
     const roomId = await saveRoom(roomData, ideas);
@@ -287,7 +251,7 @@ export default function RoomScreen({ roomData, updateRoomData, onGoHome, onGoLoa
   };
 
   function updateRoomName(name) {
-    updateRoomData({name: name});
+    updateRoomData({ name: name });
   }
 
   return (
@@ -299,7 +263,7 @@ export default function RoomScreen({ roomData, updateRoomData, onGoHome, onGoLoa
           saveRoom={handleSave}
           loadRoom={onGoLoad}
           newRoom={onGoNew}
-          setBackgroundImage={() => openImagePicker("background")}
+          setBackgroundImage={pickBackgroundImage}
           undo={() => null}
           redo={() => null}
           goHome={onGoHome}
@@ -339,7 +303,7 @@ export default function RoomScreen({ roomData, updateRoomData, onGoHome, onGoLoa
           style={{
             width: `${baseRoomDimensions.width}px`,
             height: `${baseRoomDimensions.height}px`,
-            backgroundImage: backgroundUrl === "none" ? "none" : `url("${backgroundUrl}")`,
+            backgroundImage: !roomData.imgSrc || roomData.imgSrc === "none" ? "none" : `url("${roomData.imgSrc}")`,
             backgroundSize: "100% 100%",
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat",
@@ -350,15 +314,6 @@ export default function RoomScreen({ roomData, updateRoomData, onGoHome, onGoLoa
 
           }}
         >
-          {/* File Explorer Popup for Image inputs */}
-          <input
-            onClick={(e) => e.stopPropagation()}
-            ref={imageInputRef}
-            type="file"
-            accept="image/*"
-            style={{ display: "none" }}
-            onChange={(a) => handleImageSelected(a)}
-          />
 
           {/* CORE CHANGE: Drawing the ideas from our memory onto the screen */}
           {ideas.map((idea, index) => {
@@ -375,13 +330,13 @@ export default function RoomScreen({ roomData, updateRoomData, onGoHome, onGoLoa
                 x={idea.x}
                 y={idea.y}
                 text={idea.text}
+                imageId={idea.imageId}
                 imageSrc={idea.imageSrc}
                 highlighted={idea.highlighted}
                 pathHighlighted={idea.id === currentPathId}
                 zIndex={zIndex}
                 updateIdea={updateIdea}
                 deleteIdea={deleteIdea}
-                imageInputRef={imageInputRef}
                 openImagePicker={openImagePicker}
                 key={idea.id}>
               </Idea>
@@ -415,7 +370,7 @@ export default function RoomScreen({ roomData, updateRoomData, onGoHome, onGoLoa
               onClick={(e) => e.stopPropagation()}
             >
               <button onClick={addTextIdea}>Text</button>
-              <button onClick={() => openImagePicker("idea")}>Image</button>
+              <button onClick={pickIdeaImage}>Image</button>
             </div>
           </div>
         )}

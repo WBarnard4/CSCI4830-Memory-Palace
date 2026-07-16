@@ -1,14 +1,14 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 
-export function Idea({ id, type, x, y, text, imageSrc, highlighted, pathHighlighted, zIndex, updateIdea, deleteIdea }) {
+export function Idea({ id, type, x, y, text, imageId, imageSrc, highlighted, pathHighlighted, zIndex, updateIdea, deleteIdea, openImagePicker }) {
   const [active, setActive] = useState(false);
-  const imageInputRef = useRef(null);
   const ideaInfo = {
     id: id,
     type: type,
     x: x,
     y: y,
     text: text,
+    imageId: imageId,
     imageSrc: imageSrc,
     highlighted: highlighted,
   };
@@ -38,12 +38,10 @@ export function Idea({ id, type, x, y, text, imageSrc, highlighted, pathHighligh
     let query = formData.get("posX");
     let query1 = formData.get("posY");
     let query2 = formData.get("text");
-    let query3 = formData.get("img");
 
     if (!query) query = ideaInfo.x;
     if (!query1) query1 = ideaInfo.y;
     if (!query2) query2 = ideaInfo.text;
-    if (!query3) query3 = ideaInfo.imageSrc;
 
     const newInfo = {
       id: ideaInfo.id,
@@ -51,7 +49,8 @@ export function Idea({ id, type, x, y, text, imageSrc, highlighted, pathHighligh
       x: Number(query),
       y: Number(query1),
       text: query2,
-      imageSrc: query3,
+      imageId: ideaInfo.imageId,
+      imageSrc: ideaInfo.imageSrc,
       highlighted: ideaInfo.highlighted,
     }
 
@@ -63,32 +62,16 @@ export function Idea({ id, type, x, y, text, imageSrc, highlighted, pathHighligh
     deleteIdea(ideaInfo.id);
   }
 
-  function openImagePicker() {
-    imageInputRef.current.click();
-  }
+  function chooseNewImage() {
+    openImagePicker(({ imageId, imageSrc }) => {
+      const newInfo = {
+        ...ideaInfo,
+        imageId: imageId,
+        imageSrc: imageSrc,
+      };
 
-  function handleNewImageSelected(a) {
-
-    const file = a.target.files[0];
-    const url = URL.createObjectURL(file);
-    console.log(url);
-
-    // File is not found or popup is not active
-    if (!file) {
-      return;
-    }
-
-    const newInfo = {
-      id: ideaInfo.id,
-      type: ideaInfo.type,
-      x: ideaInfo.x,
-      y: ideaInfo.y,
-      text: ideaInfo.text,
-      imageSrc: url,
-      highlighted: ideaInfo.highlighted,
-    }
-    updateIdea(newInfo);
-    a.target.value = "";
+      updateIdea(newInfo);
+    });
   }
 
   return (
@@ -132,14 +115,6 @@ export function Idea({ id, type, x, y, text, imageSrc, highlighted, pathHighligh
           />
         )}
       </div>
-      <input
-        onClick={(e) => e.stopPropagation()}
-        ref={imageInputRef}
-        type="file"
-        accept="image/*"
-        style={{ display: "none" }}
-        onChange={handleNewImageSelected}
-      />
       {active && (
         <div
           style={{
@@ -173,7 +148,7 @@ export function Idea({ id, type, x, y, text, imageSrc, highlighted, pathHighligh
             <br />
             <label name="img">Change Image Source</label>
             <br />
-            <button type="button" onClick={openImagePicker}>Select Image</button>
+            <button type="button" onClick={chooseNewImage}>Select Image</button>
             <br />
 
             <button type="button" onClick={toggleHighlight}>
