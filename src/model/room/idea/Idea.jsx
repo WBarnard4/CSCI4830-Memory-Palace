@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export function Idea({ id, type, x, y, text, imageId, imageSrc, highlighted, pathHighlighted, zIndex, updateIdea, deleteIdea, openImagePicker }) {
+export function Idea({ id, type, x, y, text, imageId, imageSrc, highlighted, pathHighlighted, zIndex, updateIdea, deleteIdea, openImagePicker, moveIdeaBack, moveIdeaForward, isFirst, isLast }) {
   const [active, setActive] = useState(false);
   const ideaInfo = {
     id: id,
@@ -72,6 +72,16 @@ export function Idea({ id, type, x, y, text, imageId, imageSrc, highlighted, pat
 
       updateIdea(newInfo);
     });
+  }
+  
+  function handleMoveBack(e) {
+    e.stopPropagation();
+    moveIdeaBack(ideaInfo.id);
+  }
+
+  function handleMoveForward(e) {
+    e.stopPropagation();
+    moveIdeaForward(ideaInfo.id);
   }
 
   return (
@@ -160,6 +170,15 @@ export function Idea({ id, type, x, y, text, imageId, imageSrc, highlighted, pat
             <button type="button" onClick={toggleHighlight}>
               {ideaInfo.highlighted ? "Remove Highlight" : "Highlight"}
             </button>
+
+            <button type="button" onClick={handleMoveBack} disabled={isFirst}>
+              ← Back
+            </button>
+            <button type="button" onClick={handleMoveForward} disabled={isLast}>
+              Forward →
+            </button>
+            <br />
+
             <br />
             <button type="submit">Submit</button>
             <button type="button" onClick={handleDelete}>Delete Idea</button>
