@@ -141,21 +141,26 @@ export function Idea({ id, type, x, y, text, imageId, imageSrc, highlighted, pat
             <br />
             <input name="posY" type="number"></input>
             <br />
+            {ideaInfo.type === "image" ? (
+              <>
+                <button type="button" onClick={chooseNewImage}>Select Image</button>
+                <br />
+              </>
+            ) : (
+              <>
+                <label name="text">Change Text</label>
+                <br />
+                <textarea name="text" defaultValue={ideaInfo.text}></textarea>
+                <br />
 
-            <label name="text">Change Text</label>
-            <br />
-            <textarea name="text" defaultValue={ideaInfo.text}></textarea>
-            <br />
-            <label name="img">Change Image Source</label>
-            <br />
-            <button type="button" onClick={chooseNewImage}>Select Image</button>
-            <br />
+              </>
+            )}
+
 
             <button type="button" onClick={toggleHighlight}>
               {ideaInfo.highlighted ? "Remove Highlight" : "Highlight"}
             </button>
             <br />
-
             <button type="submit">Submit</button>
             <button type="button" onClick={handleDelete}>Delete Idea</button>
           </form>
