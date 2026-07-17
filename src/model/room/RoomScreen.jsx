@@ -222,6 +222,26 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
     }
   }
 
+  function moveIdeaBack(id) {
+    setIdeas((prev) => {
+      const index = prev.findIndex((idea) => idea.id === id);
+      if (index <= 0) return prev; // already first
+      const updated = [...prev];
+      [updated[index - 1], updated[index]] = [updated[index], updated[index - 1]];
+      return updated;
+    });
+  }
+
+  function moveIdeaForward(id) {
+    setIdeas((prev) => {
+      const index = prev.findIndex((idea) => idea.id === id);
+      if (index === -1 || index >= prev.length - 1) return prev; // already last
+      const updated = [...prev];
+      [updated[index], updated[index + 1]] = [updated[index + 1], updated[index]];
+      return updated;
+    });
+  }
+
   function startPath() {
     if (ideas.length === 0) return;
     setPathActive(true);
@@ -361,6 +381,10 @@ export default function RoomScreen({ activeRoom, onGoHome }) {
                 zIndex={zIndex}
                 updateIdea={updateIdea}
                 deleteIdea={deleteIdea}
+                moveIdeaBack={moveIdeaBack}
+                moveIdeaForward={moveIdeaForward}
+                isFirst={index === 0}
+                isLast={index === ideas.length - 1}
                 imageInputRef={imageInputRef}
                 openImagePicker={openImagePicker}
                 key={idea.id}>

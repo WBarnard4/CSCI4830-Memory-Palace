@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 
-export function Idea({ id, type, x, y, text, imageSrc, highlighted, pathHighlighted, zIndex, updateIdea, deleteIdea }) {
+export function Idea({ id, type, x, y, text, imageSrc, highlighted, pathHighlighted, zIndex, updateIdea, deleteIdea, moveIdeaBack, moveIdeaForward, isFirst, isLast }) {
   const [active, setActive] = useState(false);
   const imageInputRef = useRef(null);
   const ideaInfo = {
@@ -61,6 +61,16 @@ export function Idea({ id, type, x, y, text, imageSrc, highlighted, pathHighligh
 
   function handleDelete() {
     deleteIdea(ideaInfo.id);
+  }
+
+    function handleMoveBack(e) {
+    e.stopPropagation();
+    moveIdeaBack(ideaInfo.id);
+  }
+
+  function handleMoveForward(e) {
+    e.stopPropagation();
+    moveIdeaForward(ideaInfo.id);
   }
 
   function openImagePicker() {
@@ -179,6 +189,15 @@ export function Idea({ id, type, x, y, text, imageSrc, highlighted, pathHighligh
             <button type="button" onClick={toggleHighlight}>
               {ideaInfo.highlighted ? "Remove Highlight" : "Highlight"}
             </button>
+
+            <button type="button" onClick={handleMoveBack} disabled={isFirst}>
+              ← Back
+            </button>
+            <button type="button" onClick={handleMoveForward} disabled={isLast}>
+              Forward →
+            </button>
+            <br />
+
             <br />
 
             <button type="submit">Submit</button>
