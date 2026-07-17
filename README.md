@@ -42,3 +42,9 @@ In a web browser, navigate to that address to access the website.
 - A menu at the top left allows users to return to the main menu or change the background image. Placeholder buttons are present for saving and loading functionality to be implemented in the future.
 - The path menu at the top right shows users the order their ideas are in and gives them the ability to highlight ideas in said order, one at a time. They can traverse forwards or backwards in the order. The ability to reorder ideas will be implemented in the future.
 - Elements on the screen will dynamically resize themselves when the size of the window is changed, keeping their size and position relative to each other
+
+## 7/17/2026
+- App has been refactored to separate HomeScreen, LoadRoomScreen, and NewRoomScreen into individual classes that can pass a roomData object between them.
+- IndexedDB database has been implemented to save Room data (Room name, Idea data, etc.) via the Room Menu. This can be loaded in the LoadRoomScreen through the roomData object.
+- Ideas can be reorded via the Idea Menu which changes their position in the Path system.
+- A tests folder and test files have been created to implement unit tests on certain functions.
