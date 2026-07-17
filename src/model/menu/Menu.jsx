@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
+import { isValidRoomName } from "@/utils/RoomValidation";
 import "./Menu.css";
 
-export function Menu({ saveRoom, loadRoom, newRoom, setBackgroundImage, undo, redo, goHome, areChanges }) {
+export function Menu({ menuName, updateMenuName, saveRoom, loadRoom, newRoom, setBackgroundImage, undo, redo, goHome, areChanges }) {
 	const [opened, setOpened] = useState(false);
 	const [areYouSurePopup, setAreYouSurePopup] = useState(false);
 	const [sureCallback, setSureCallback] = useState(null);
@@ -68,16 +69,6 @@ export function Menu({ saveRoom, loadRoom, newRoom, setBackgroundImage, undo, re
 	}, [showSavedPopup]);
 
 	/**
-	 * Verifies no data is overwritten before calling the loadRoom argument
-	 * Placeholder until the loadRoom argument is implemented;
-	 *
-	 * Feature coming soon TODO: Implement
-	 */
-	function loadRoomComingSoon() {
-		setComingSoon(true);
-	}
-
-	/**
 	 * Placeholder until the undo argument is implemented.
 	 *
 	 * Feature coming soon TODO: Implement
@@ -108,6 +99,20 @@ export function Menu({ saveRoom, loadRoom, newRoom, setBackgroundImage, undo, re
 		};
 	}, [comingSoon]);
 
+	function newNameEntered(event) {
+		if (event.key != "Enter") {
+			return;
+		}
+
+		if (!isValidRoomName(event.target.value)) {
+			event.target.value = menuName;
+			return;
+		}
+
+		updateMenuName(event.target.value);
+		event.target.blur();
+	}
+
 	return (
 		<div
 			className="menu"
@@ -125,9 +130,7 @@ export function Menu({ saveRoom, loadRoom, newRoom, setBackgroundImage, undo, re
 					)}
 
 					{areYouSurePopup ? (
-						<div className="menu-sure"
-							onBlur={() => areYouSureNo()}
-						>
+						<div className="menu-sure">
 							<h2>Are you sure?</h2>
 							<h3>Data may be lost</h3>
 							<button onClick={areYouSureNo}>No</button>
@@ -137,8 +140,15 @@ export function Menu({ saveRoom, loadRoom, newRoom, setBackgroundImage, undo, re
 						<div className="menu-opened"
 							onMouseLeave={() => setOpened(false)}
 						>
+							<input
+								key={menuName}
+								className="menu-name-input"
+								type="text"
+								defaultValue={menuName}
+								onKeyDown={newNameEntered}
+							/>
 							<button onClick={saveWithFeedback}>Save</button>
-							<button onClick={loadRoomComingSoon}>Load</button>
+							<button onClick={() => verifyWithPopup(loadRoom)}>Load</button>
 							<button onClick={() => verifyWithPopup(newRoom)}>New Room</button>
 							<button onClick={setBackgroundImage}>Change Background</button>
 							<div className="menu-arrows">
