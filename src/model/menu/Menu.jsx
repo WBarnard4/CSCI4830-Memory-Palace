@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { isValidRoomName } from "@/utils/RoomValidation";
 import "./Menu.css";
 
@@ -8,6 +8,22 @@ export function Menu({ menuName, updateMenuName, saveRoom, loadRoom, newRoom, se
 	const [sureCallback, setSureCallback] = useState(null);
 	const [showSavedPopup, setShowSavedPopup] = useState(false);
 	const [comingSoon, setComingSoon] = useState(false);
+
+	const menuRef = useRef(null);
+
+	useEffect(() => {
+		function closeMenuOnOutsideClick(event) {
+			if (opened && menuRef.current && !menuRef.current.contains(event.target)) {
+				setOpened(false);
+			}
+		}
+
+		document.addEventListener("mousedown", closeMenuOnOutsideClick);
+
+		return () => {
+			document.removeEventListener("mousedown", closeMenuOnOutsideClick);
+		};
+	}, [opened]);
 
 	/**
 	 * Removes the areYouSure popup and sets sureCallback to null.
@@ -116,9 +132,8 @@ export function Menu({ menuName, updateMenuName, saveRoom, loadRoom, newRoom, se
 
 	return (
 		<div
+			ref={menuRef}
 			className="menu"
-			onMouseEnter={() => setOpened(true)}
-			onClick={(event) => event.stopPropagation()}
 		>
 			{opened ? (
 				<div>
@@ -138,9 +153,7 @@ export function Menu({ menuName, updateMenuName, saveRoom, loadRoom, newRoom, se
 							<button onClick={areYouSureYes}>Yes</button>
 						</div>
 					) : (
-						<div className="menu-opened"
-							onMouseLeave={() => setOpened(false)}
-						>
+						<div className="menu-opened">
 							<input
 								key={menuName}
 								className="menu-name-input"
@@ -149,20 +162,42 @@ export function Menu({ menuName, updateMenuName, saveRoom, loadRoom, newRoom, se
 								onKeyDown={newNameEntered}
 								onBlur={newNameEntered}
 							/>
+
 							<button onClick={saveWithFeedback}>Save</button>
 							<button onClick={() => verifyWithPopup(loadRoom)}>Load</button>
 							<button onClick={() => verifyWithPopup(newRoom)}>New Room</button>
 							<button onClick={setBackgroundImage}>Change Background</button>
+
 							<div className="menu-arrows">
-								<button onClick={undoComingSoon} className="menu-arrow-left"></button>
-								<button onClick={redoComingSoon} className="menu-arrow-right"></button>
+								<button
+									onClick={undoComingSoon}
+									className="menu-arrow-left"
+								></button>
+
+								<button
+									onClick={redoComingSoon}
+									className="menu-arrow-right"
+								></button>
 							</div>
+
 							<button onClick={() => verifyWithPopup(goHome)}>Home</button>
+
+							<button
+								className="menu-close-button"
+								onClick={() => setOpened(false)}
+							>
+								Close
+							</button>
 						</div>
 					)}
 				</div>
 			) : (
-				<div className="menu-closed"></div>
+				<button
+					type="button"
+					className="menu-closed"
+					aria-label="Open menu"
+					onClick={() => setOpened(true)}
+				></button>
 			)}
 		</div>
 	);
