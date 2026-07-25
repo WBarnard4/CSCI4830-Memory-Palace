@@ -104,12 +104,13 @@ export function Menu({ menuName, updateMenuName, saveRoom, loadRoom, newRoom, se
 			return;
 		}
 
-		if (!isValidRoomName(event.target.value)) {
+		const newName = event.target.value;
+		if (!isValidRoomName(newName)) {
 			event.target.value = menuName;
 			return;
 		}
 
-		updateMenuName(event.target.value);
+		updateMenuName(newName);
 		event.target.blur();
 	}
 

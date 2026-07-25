@@ -15,6 +15,7 @@ export default function NewRoomScreen({ isOpen, onClose, onGoHome, openImagePick
     // If state is incorrect, do not render component
     const [roomCreation, setRoomCreation] = useState({
         imgSrc: null,
+        imageId: null,
         name: DEFAULT_NAME
     });
 
@@ -25,7 +26,7 @@ export default function NewRoomScreen({ isOpen, onClose, onGoHome, openImagePick
     }
 
     function createRoom() {
-        onClose(roomCreation.name, roomCreation.imgSrc);
+        onClose(roomCreation.name, roomCreation.imageId, roomCreation.imgSrc);
     }
 
     function pickBackground() {
@@ -33,6 +34,7 @@ export default function NewRoomScreen({ isOpen, onClose, onGoHome, openImagePick
             setRoomCreation({
                 ...roomCreation,
                 imgSrc: imageSrc,
+                imageId: imageId,
                 backgroundImageId: imageId,
             });
         });

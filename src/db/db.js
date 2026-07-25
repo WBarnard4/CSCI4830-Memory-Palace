@@ -3,19 +3,21 @@ import Dexie from "dexie";
 export const db = new Dexie("MemoryPalaceDB");
 
 db.version(1).stores({
-  rooms:   "++id, name",          // imageId lives on the object, no index needed
-  ideas:   "++id, roomId",        // roomId indexed so you can query ideas per room
-  images:  "++id",                // name + data (Blob) stored, not indexed
+  rooms: "++id, name",          // imageId lives on the object, no index needed
+  ideas: "++id, roomId",        // roomId indexed so you can query ideas per room
+  images: "++id",                // name + data (Blob) stored, not indexed
   changes: "++id, roomId, index", // for the undo/redo history
 });
+
 export async function saveImage(file) {
-    //console.log("saveImage called with:", file.name);
+  //console.log("saveImage called with:", file.name);
   const id = await db.images.add({
     name: file.name,
     data: file, // File is a Blob — Dexie stores it as-is
   });
   return id;
 }
+
 export async function getImageUrl(imageId) {
   const record = await db.images.get(imageId);
   if (!record) {
@@ -24,15 +26,23 @@ export async function getImageUrl(imageId) {
   return URL.createObjectURL(record.data);
 }
 
-export async function createRoom(name, imageFile) {
-  return db.transaction("rw", db.images, db.rooms, async () => {
-    const imageId = imageFile ? await saveImage(imageFile) : null;
-    return db.rooms.add({ name, imageId });
+export async function createRoom(name, imageId) {
+  return await db.rooms.add({
+    name: name,
+    imageId: imageId ?? null,
   });
 }
+
 export async function getAllRooms() {
   return db.rooms.toArray();
 }
+
+export async function updateRoomName(roomId, roomName) {
+  await db.rooms.update(roomId, {
+    name: roomName,
+  });
+}
+
 export async function saveRoom(roomData, ideas) {
   return db.transaction("rw", db.rooms, db.ideas, db.images, async () => {
     let roomId = roomData.id;
@@ -40,6 +50,12 @@ export async function saveRoom(roomData, ideas) {
     // First save: room doesn't exist in the DB yet
     if (roomId == null) {
       roomId = await db.rooms.add({
+        name: roomData.name,
+        imageId: roomData.imageId ?? null,
+        imgSrc: roomData.imgSrc ?? null,
+      });
+    } else {
+      await db.rooms.update(roomId, {
         name: roomData.name,
         imageId: roomData.imageId ?? null,
       });
@@ -71,9 +87,9 @@ export async function loadRoom(roomId) {
   return {
     id: room.id,
     name: room.name,
+    imageId: room.imageId ?? null,
     imgSrc,
     ideas,
-    type: "Load",
   };
 }
 

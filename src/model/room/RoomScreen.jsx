@@ -59,7 +59,7 @@ export default function RoomScreen({ roomData, updateRoomData, openImagePicker, 
     openImagePicker(({ imageId, imageSrc }) => {
       updateRoomData({
         imgSrc: imageSrc,
-        backgroundImageId: imageId,
+        imageId: imageId,
       });
     });
   }
