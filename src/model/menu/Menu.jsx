@@ -100,7 +100,7 @@ export function Menu({ menuName, updateMenuName, saveRoom, loadRoom, newRoom, se
 	}, [comingSoon]);
 
 	function newNameEntered(event) {
-		if (event.key != "Enter") {
+		if (event.key != "Enter" && event.type != "blur") {
 			return;
 		}
 
@@ -147,6 +147,7 @@ export function Menu({ menuName, updateMenuName, saveRoom, loadRoom, newRoom, se
 								type="text"
 								defaultValue={menuName}
 								onKeyDown={newNameEntered}
+								onBlur={newNameEntered}
 							/>
 							<button onClick={saveWithFeedback}>Save</button>
 							<button onClick={() => verifyWithPopup(loadRoom)}>Load</button>
