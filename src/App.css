@@ -55,7 +55,7 @@
   border: 3px solid white;
   border-radius: 12px;
 
-  background-size: cover;
+  background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
 

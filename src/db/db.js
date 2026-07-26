@@ -34,7 +34,17 @@ export async function createRoom(name, imageId) {
 }
 
 export async function getAllRooms() {
-  return db.rooms.toArray();
+  const rooms = await db.rooms.toArray();
+  for (let i = 0; i < rooms.length; i++) {
+    const imageId = rooms[i].imageId ?? null;
+    const imgSrc = imageId ? await getImageUrl(imageId) : null;
+    rooms[i] = {
+      ...rooms[i],
+      imageId: imageId,
+      imgSrc: imgSrc,
+    }
+  }
+  return rooms;
 }
 
 export async function updateRoomName(roomId, roomName) {
@@ -82,12 +92,13 @@ export async function loadRoom(roomId) {
   if (!room) return null;
 
   const ideas = await db.ideas.where("roomId").equals(roomId).toArray();
-  const imgSrc = room.imageId ? await getImageUrl(room.imageId) : null;
+  const imageId = room.imageId ?? null;
+  const imgSrc = imageId ? await getImageUrl(imageId) : null;
 
   return {
     id: room.id,
     name: room.name,
-    imageId: room.imageId ?? null,
+    imageId: imageId,
     imgSrc,
     ideas,
   };
