@@ -1,134 +1,762 @@
 .menu {
-  position: fixed;
-  top: 16px;
-  left: 16px;
-  z-index: 1000;
-  font-family: inherit;
+	position: fixed;
+	top: 16px;
+	left: 16px;
+	z-index: 1000;
+	font-family: inherit;
+
+	--glass-background: rgba(225, 235, 245, 0.06);
+	--glass-background-hover: rgba(240, 247, 255, 0.13);
+	--glass-border: rgba(255, 255, 255, 0.32);
+	--glass-shadow: rgba(5, 12, 22, 0.2);
+	--glass-lines: rgba(250, 253, 255, 0.82);
+	--glass-text: rgba(15, 20, 28, 0.94);
 }
 
-/* Closed Menu */
-.menu-closed {
-  width: 50px;
-  height: 50px;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #6b7280;
-  border: 1px solid #8b929e;
-  border-radius: 50%;
-  cursor: pointer;
-  box-sizing: border-box;
+/* Shared liquid-glass appearance */
+.menu-closed,
+.menu-panel,
+.menu-action,
+.menu-input-ripple,
+.menu-sure,
+.menu-saved-popup,
+.menu-coming-soon {
+	background:
+		linear-gradient(
+			135deg,
+			rgba(255, 255, 255, 0.13),
+			rgba(255, 255, 255, 0.018)
+		),
+		var(--glass-background);
+
+	border: 1px solid var(--glass-border);
+
+	box-shadow:
+		inset 0 1px 1px rgba(255, 255, 255, 0.32),
+		inset 0 -1px 1px rgba(255, 255, 255, 0.05),
+		0 8px 24px var(--glass-shadow);
+
+	-webkit-backdrop-filter: blur(7px) saturate(145%);
+	backdrop-filter: blur(7px) saturate(145%);
 }
 
-/* 3 Lines on Menu */
-.menu-closed::before {
-  content: "";
-  width: 24px;
-  height: 3px;
-  background: white;
-  border-radius: 2px;
-  box-shadow:
-    0 -8px 0 white,
-    0 8px 0 white;
-}
-
-/* Outer Menu Rectangle */
-.menu > div:not(.menu-closed) {
-  width: 140px;
-  padding: 8px;
-  box-sizing: border-box;
-  background: #eeeeee;
-  border: 1px solid #777777;
-  border-radius: 5px;
-  color: black;
-}
-
-/* Menu Options are Tiled Vertically */
-.menu-opened,
-.menu-sure {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-
-.menu-name-input {
-	width: 100%;
-	box-sizing: border-box;
-	margin: 0 0 7px;
-	padding: 5px;
-	font: inherit;
-	font-size: 13px;
-	color: black;
-	background: white;
-	border: 1px solid #888888;
-	border-radius: 3px;
-}
-
-/* Menu Buttons */
-.menu button {
-  width: 100%;
-  padding: 6px;
-  font: inherit;
-  font-size: 14px;
-  color: black;
-  background: white;
-  border: 1px solid #888888;
-  border-radius: 3px;
-  cursor: pointer;
-}
-
+/* Closed menu button */
 .menu button.menu-closed {
-  width: 50px;
-  height: 50px;
-  padding: 0;
-  border-radius: 50%;
-  background: #bbbbbb;
+	position: relative;
+	width: 54px;
+	height: 54px;
+	padding: 0;
+	overflow: hidden;
+	isolation: isolate;
+
+	border-radius: 50%;
+	cursor: pointer;
+
+	background-color: rgba(210, 220, 232, 0.08);
+
+	transition:
+		transform 180ms ease,
+		background-color 180ms ease,
+		box-shadow 180ms ease;
 }
 
-.menu button:hover {
-  background: #dddddd;
+/* Glass-like hamburger lines */
+.menu-closed::before {
+	content: "";
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	z-index: 3;
+
+	width: 24px;
+	height: 3px;
+
+	background: var(--glass-lines);
+	border-radius: 999px;
+
+	transform: translate(-50%, -50%);
+
+	box-shadow:
+		0 -8px 0 var(--glass-lines),
+		0 8px 0 var(--glass-lines);
+
+	filter:
+		blur(0.35px)
+		drop-shadow(0 0 3px rgba(255, 255, 255, 0.65));
+
+	opacity: 0.9;
 }
 
-/* Confirmation text */
-.menu-sure h2 {
-  margin: 0;
-  font-size: 16px;
+.menu-closed:hover {
+	transform: scale(1.05);
+	background-color: rgba(235, 242, 250, 0.15);
+
+	box-shadow:
+		inset 0 1px 1px rgba(255, 255, 255, 0.42),
+		0 10px 28px rgba(5, 12, 22, 0.26);
 }
 
-.menu-sure h3 {
-  margin: 0 0 4px;
-  font-size: 12px;
-  font-weight: normal;
+.menu-closed:active {
+	transform: scale(0.84);
 }
 
-/* Saved and coming-soon messages */
-.menu h1 {
-  margin: 0 0 7px;
-  padding: 0;
-  font-size: 13px;
-  line-height: 1.2;
-  color: black;
+/* Open menu panel */
+.menu-panel {
+	position: relative;
+	width: 250px;
+	padding: 12px;
+	overflow: visible;
+	isolation: isolate;
+	box-sizing: border-box;
+
+	border-radius: 20px;
+	color: var(--glass-text);
+
+	transform-origin: 27px 27px;
+
+	/*
+	 * Do not use "forwards" or "both" here.
+	 * After opening finishes, clip-path returns to none so popups
+	 * can extend outside the menu.
+	 */
+	animation: menu-panel-open 450ms
+		cubic-bezier(0.2, 0.8, 0.25, 1);
 }
 
-/* Arrows for undo and redo */
+/*
+ * Recreates the hamburger icon while the closed button
+ * collapses horizontally.
+ */
+.menu-panel::before {
+	content: "";
+	position: absolute;
+	left: 27px;
+	top: 27px;
+	z-index: 50;
+
+	width: 24px;
+	height: 3px;
+
+	background: var(--glass-lines);
+	border-radius: 999px;
+
+	box-shadow:
+		0 -8px 0 var(--glass-lines),
+		0 8px 0 var(--glass-lines);
+
+	filter:
+		blur(0.35px)
+		drop-shadow(0 0 3px rgba(255, 255, 255, 0.65));
+
+	transform: translate(-50%, -50%) scaleX(1);
+	opacity: 0;
+	pointer-events: none;
+
+	animation: menu-icon-open 450ms ease;
+}
+
+/* Reverse panel animation */
+.menu-panel.menu-closing {
+	pointer-events: none;
+
+	animation: menu-panel-close 425ms
+		cubic-bezier(0.2, 0.8, 0.25, 1) both;
+}
+
+.menu-panel.menu-closing::before {
+	animation: menu-icon-close 425ms ease both;
+}
+
+/* Menu contents */
+.menu-opened {
+	display: flex;
+	flex-direction: column;
+	gap: 9px;
+
+	animation: menu-content-appear 100ms ease-out 350ms both;
+}
+
+.menu-panel.menu-closing .menu-opened {
+	animation: menu-content-disappear 70ms ease-in both;
+}
+
+/* Room-name input wrapper */
+.menu-input-ripple {
+	position: relative;
+	overflow: hidden;
+	isolation: isolate;
+	border-radius: 12px;
+
+	transition:
+		transform 160ms ease,
+		background-color 160ms ease,
+		box-shadow 160ms ease;
+}
+
+/* Wrapping room-name textarea */
+.menu-name-input {
+	position: relative;
+	z-index: 3;
+
+	display: block;
+	width: 100%;
+	min-height: 54px;
+	max-height: 90px;
+	padding: 9px 12px;
+	box-sizing: border-box;
+
+	font: inherit;
+	font-size: 15px;
+	font-weight: 600;
+	line-height: 1.25;
+	color: var(--glass-text);
+
+	background: rgba(255, 255, 255, 0.025);
+	border: 0;
+	border-radius: 12px;
+	outline: none;
+	resize: none;
+
+	white-space: pre-wrap;
+	overflow-wrap: normal;
+	word-break: normal;
+
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+.menu-name-input::selection {
+	background: rgba(120, 170, 230, 0.35);
+}
+
+.menu-input-ripple:hover,
+.menu-input-ripple:focus-within {
+	transform: translateY(-1px);
+	background-color: var(--glass-background-hover);
+}
+
+.menu-input-ripple:focus-within {
+	box-shadow:
+		inset 0 1px 1px rgba(255, 255, 255, 0.45),
+		0 0 0 2px rgba(255, 255, 255, 0.18),
+		0 8px 20px rgba(5, 12, 22, 0.18);
+}
+
+/* Main menu buttons */
+.menu .menu-action {
+	position: relative;
+	width: 100%;
+	min-height: 39px;
+	padding: 8px 10px;
+	overflow: hidden;
+	isolation: isolate;
+
+	font: inherit;
+	font-size: 14px;
+	font-weight: 550;
+	color: var(--glass-text);
+
+	background:
+		linear-gradient(
+			135deg,
+			rgba(255, 255, 255, 0.1),
+			rgba(255, 255, 255, 0.015)
+		),
+		rgba(225, 235, 245, 0.035);
+
+	border-radius: 11px;
+	cursor: pointer;
+
+	transition:
+		transform 150ms ease,
+		background-color 150ms ease,
+		box-shadow 150ms ease;
+}
+
+.menu-action::before {
+	position: relative;
+	z-index: 3;
+}
+
+/* Ripple layer */
+.menu-action::after,
+.menu-input-ripple::after,
+.menu-closed::after {
+	content: "";
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	z-index: 2;
+
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+
+	background: transparent;
+	border: 2px solid rgba(255, 255, 255, 0.68);
+
+	box-shadow:
+		0 0 0 5px rgba(255, 255, 255, 0.16),
+		0 0 0 11px rgba(180, 215, 245, 0.14),
+		inset 0 0 8px rgba(255, 255, 255, 0.32);
+
+	transform: translate(-50%, -50%) scale(0);
+	opacity: 0;
+	pointer-events: none;
+}
+
+/* Normal hover ripple */
+.menu-action:hover::after,
+.menu-input-ripple:hover::after,
+.menu-closed:hover::after {
+	animation: glass-ripple 850ms ease-out;
+}
+
+/* Prevent another hover ripple after releasing a click */
+.menu-action.menu-ripple-clicked:hover::after,
+.menu-input-ripple.menu-ripple-clicked:hover::after,
+.menu-closed.menu-ripple-clicked:hover::after {
+	animation: none;
+}
+
+/* Larger click ripple */
+.menu-action.menu-ripple-clicked:active::after,
+.menu-input-ripple.menu-ripple-clicked:active::after,
+.menu-closed.menu-ripple-clicked:active::after {
+	animation: glass-ripple-click 500ms ease-out;
+}
+
+.menu-action:hover {
+	transform: translateY(-1px);
+	background-color: rgba(245, 250, 255, 0.1);
+
+	box-shadow:
+		inset 0 1px 1px rgba(255, 255, 255, 0.4),
+		0 7px 18px rgba(5, 12, 22, 0.14);
+}
+
+.menu-action:active {
+	transform: scale(0.965);
+	background-color: rgba(245, 250, 255, 0.17);
+}
+
+/* Save button and popup */
+.menu-save-row {
+	position: relative;
+	overflow: visible;
+}
+
+.menu-save-row .menu-action {
+	display: block;
+}
+
+/* Saved message appears to the right of Save Room */
+.menu-saved-popup {
+	position: absolute;
+	left: calc(100% + 10px);
+	top: 50%;
+	z-index: 30;
+
+	width: max-content;
+	padding: 8px 12px;
+
+	border-radius: 11px;
+	font-size: 13px;
+	font-weight: 650;
+	white-space: nowrap;
+
+	transform: translateY(-50%);
+	pointer-events: none;
+
+	animation: saved-popup-enter 300ms ease-out;
+}
+
+/* Two-button rows */
+.menu-room-actions,
+.menu-arrows,
+.menu-sure-actions {
+	display: flex;
+	gap: 9px;
+}
+
+.menu-room-actions .menu-action,
+.menu-arrows .menu-action,
+.menu-sure-actions .menu-action {
+	flex: 1;
+	min-width: 0;
+}
+
+/* Undo and redo */
 .menu-arrows {
-  display: flex;
-  gap: 6px;
-}
-
-.menu-arrows button {
-  flex: 1;
-  height: 30px;
-  padding: 0;
-  font-size: 18px;
+	position: relative;
 }
 
 .menu-arrow-left::before {
-  content: "Undo";
+	content: "Undo";
 }
 
 .menu-arrow-right::before {
-  content: "Redo";
+	content: "Redo";
+}
+
+/* Overlay covering Undo and Redo */
+.menu-coming-soon {
+	position: absolute;
+	inset: 0;
+	z-index: 8;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	border-radius: 11px;
+	font-size: 13px;
+	font-weight: 650;
+	color: var(--glass-text);
+
+	animation: popup-ripple 380ms ease-out;
+}
+
+/* Confirmation overlay */
+.menu-sure {
+	position: absolute;
+	inset: 12px;
+	z-index: 20;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	gap: 7px;
+
+	padding: 16px;
+	border-radius: 15px;
+
+	animation: popup-ripple 420ms ease-out;
+}
+
+.menu-sure h2 {
+	margin: 0;
+	font-size: 17px;
+	text-align: center;
+}
+
+.menu-sure h3 {
+	margin: 0 0 7px;
+	font-size: 12px;
+	font-weight: normal;
+	text-align: center;
+	opacity: 0.75;
+}
+
+/* Bottom portion of the menu */
+.menu-close-zone {
+	position: relative;
+	height: 34px;
+	margin: 0 -12px -12px;
+	padding: 4px 12px 8px;
+	overflow: hidden;
+	box-sizing: border-box;
+
+	border-radius: 0 0 20px 20px;
+	border-top: 1px solid rgba(255, 255, 255, 0.09);
+
+	background:
+		linear-gradient(
+			180deg,
+			rgba(255, 255, 255, 0.025),
+			rgba(215, 228, 240, 0.08)
+		);
+
+	-webkit-backdrop-filter: blur(7px) saturate(145%);
+	backdrop-filter: blur(7px) saturate(145%);
+
+	box-shadow:
+		inset 0 -1px 1px rgba(255, 255, 255, 0.12),
+		0 -4px 10px rgba(5, 12, 22, 0.025);
+
+	transform-origin: bottom center;
+}
+
+.menu-close-zone:hover {
+	animation: menu-bottom-bob 650ms ease-in-out infinite;
+}
+
+/* Close handle */
+.menu .menu-close-button {
+	position: relative;
+	z-index: 2;
+
+	display: block;
+	width: 100%;
+	height: 22px;
+	padding: 0;
+
+	background: transparent;
+	border: 0;
+	cursor: pointer;
+}
+
+.menu-close-button span {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+
+	width: 58px;
+	height: 5px;
+
+	background: rgba(45, 54, 65, 0.48);
+	border: 1px solid rgba(255, 255, 255, 0.3);
+	border-radius: 999px;
+
+	transform: translate(-50%, -50%);
+
+	box-shadow:
+		inset 0 1px 1px rgba(255, 255, 255, 0.4),
+		0 2px 5px rgba(5, 12, 22, 0.16);
+
+	transition:
+		width 180ms ease,
+		background-color 180ms ease;
+}
+
+.menu-close-zone:hover .menu-close-button span {
+	width: 76px;
+	background: rgba(35, 44, 55, 0.62);
+}
+
+/*
+ * Opening:
+ * 1. Circle collapses inward from both sides into a tall line.
+ * 2. Brief pause.
+ * 3. Line expands horizontally into the open menu width.
+ * 4. Menu quickly expands vertically downward.
+ */
+@keyframes menu-panel-open {
+	0% {
+		clip-path: inset(
+			0 calc(100% - 54px) calc(100% - 54px) 0
+			round 27px
+		);
+	}
+
+	18% {
+		clip-path: inset(
+			0 calc(100% - 29px) calc(100% - 54px) 25px
+			round 3px
+		);
+	}
+
+	30% {
+		clip-path: inset(
+			0 calc(100% - 29px) calc(100% - 54px) 25px
+			round 3px
+		);
+	}
+
+	76% {
+		clip-path: inset(
+			0 0 calc(100% - 54px) 0
+			round 20px
+		);
+	}
+
+	100% {
+		clip-path: inset(0 round 20px);
+	}
+}
+
+/*
+ * Closing reverses opening:
+ * 1. Menu quickly collapses vertically to 54px.
+ * 2. It slowly collapses horizontally into a tall line.
+ * 3. Brief pause.
+ * 4. The line expands sideways into the closed circle.
+ */
+@keyframes menu-panel-close {
+	0% {
+		clip-path: inset(0 round 20px);
+	}
+
+	24% {
+		clip-path: inset(
+			0 0 calc(100% - 54px) 0
+			round 20px
+		);
+	}
+
+	70% {
+		clip-path: inset(
+			0 calc(100% - 29px) calc(100% - 54px) 25px
+			round 3px
+		);
+	}
+
+	82% {
+		clip-path: inset(
+			0 calc(100% - 29px) calc(100% - 54px) 25px
+			round 3px
+		);
+	}
+
+	100% {
+		clip-path: inset(
+			0 calc(100% - 54px) calc(100% - 54px) 0
+			round 27px
+		);
+	}
+}
+
+/* Hamburger lines collapse sideways with the circle */
+@keyframes menu-icon-open {
+	0% {
+		opacity: 0.9;
+		transform: translate(-50%, -50%) scaleX(1);
+	}
+
+	18% {
+		opacity: 0.75;
+		transform: translate(-50%, -50%) scaleX(0.06);
+	}
+
+	30% {
+		opacity: 0;
+		transform: translate(-50%, -50%) scaleX(0.06);
+	}
+
+	100% {
+		opacity: 0;
+		transform: translate(-50%, -50%) scaleX(0.06);
+	}
+}
+
+/* Hamburger lines return as the tall line becomes a circle */
+@keyframes menu-icon-close {
+	0%,
+	70% {
+		opacity: 0;
+		transform: translate(-50%, -50%) scaleX(0.06);
+	}
+
+	82% {
+		opacity: 0.65;
+		transform: translate(-50%, -50%) scaleX(0.06);
+	}
+
+	100% {
+		opacity: 0.9;
+		transform: translate(-50%, -50%) scaleX(1);
+	}
+}
+
+@keyframes menu-content-appear {
+	from {
+		opacity: 0;
+		transform: translateY(-8px);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes menu-content-disappear {
+	from {
+		opacity: 1;
+		transform: translateY(0);
+	}
+
+	to {
+		opacity: 0;
+		transform: translateY(-8px);
+	}
+}
+
+/* Normal hover ripple */
+@keyframes glass-ripple {
+	0% {
+		transform: translate(-50%, -50%) scale(0.15);
+		opacity: 0;
+	}
+
+	12% {
+		opacity: 0.9;
+	}
+
+	65% {
+		opacity: 0.36;
+	}
+
+	100% {
+		transform: translate(-50%, -50%) scale(10);
+		opacity: 0;
+	}
+}
+
+/* Larger click ripple */
+@keyframes glass-ripple-click {
+	0% {
+		transform: translate(-50%, -50%) scale(0.1);
+		opacity: 1;
+		border-width: 3px;
+	}
+
+	55% {
+		opacity: 0.55;
+	}
+
+	100% {
+		transform: translate(-50%, -50%) scale(15);
+		opacity: 0;
+		border-width: 1px;
+	}
+}
+
+/* Popup entrance */
+@keyframes popup-ripple {
+	0% {
+		transform: scale(0.82);
+		opacity: 0;
+		filter: blur(5px);
+	}
+
+	65% {
+		transform: scale(1.035);
+		opacity: 1;
+		filter: blur(0);
+	}
+
+	100% {
+		transform: scale(1);
+		opacity: 1;
+	}
+}
+
+@keyframes saved-popup-enter {
+	0% {
+		opacity: 0;
+		transform: translate(-8px, -50%) scale(0.88);
+	}
+
+	65% {
+		opacity: 1;
+		transform: translate(2px, -50%) scale(1.03);
+	}
+
+	100% {
+		opacity: 1;
+		transform: translate(0, -50%) scale(1);
+	}
+}
+
+/* Moves the entire bottom menu section */
+@keyframes menu-bottom-bob {
+	0%,
+	100% {
+		transform: translateY(0) scaleY(1);
+	}
+
+	50% {
+		transform: translateY(-5px) scaleY(0.9);
+	}
 }
