@@ -61,7 +61,7 @@ function App() {
   async function handleNewRoomClick(name, imageId, imgSrc) {
     setHomeState(HOME_STATES.MAIN);
 
-    const id = await createRoom(name, imageId)
+    const id = await createRoom(name, imageId, imgSrc);
 
     setActiveRoom({
       id: id,

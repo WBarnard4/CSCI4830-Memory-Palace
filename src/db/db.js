@@ -26,10 +26,11 @@ export async function getImageUrl(imageId) {
   return URL.createObjectURL(record.data);
 }
 
-export async function createRoom(name, imageId) {
+export async function createRoom(name, imageId, imgSrc) {
   return await db.rooms.add({
     name: name,
     imageId: imageId ?? null,
+    imgSrc: imgSrc ?? null,
   });
 }
 
@@ -59,11 +60,7 @@ export async function saveRoom(roomData, ideas) {
 
     // First save: room doesn't exist in the DB yet
     if (roomId == null) {
-      roomId = await db.rooms.add({
-        name: roomData.name,
-        imageId: roomData.imageId ?? null,
-        imgSrc: roomData.imgSrc ?? null,
-      });
+      roomId = createRoom(roomData.name, roomData.imageId, roomData.imgSrc);
     } else {
       await db.rooms.update(roomId, {
         name: roomData.name,
