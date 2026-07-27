@@ -76,37 +76,28 @@ export default function NewRoomScreen({ isOpen, onClose, onGoHome, openImagePick
                 &#8592;
             </button>
             <div className="room-grid">
-                {/* set activeRoom to Bedroom, rendering it in App.jsx */}
-                <button
-                    className="room-button glass-surface glass-ripple glass-button bedroom-button"
-                    onClick={() => setupRoomCreation("Bedroom", bedroomUrl)}
-                >
-                    Bedroom
-                </button>
-
-                {/* set activeRoom to Living Room, rendering it in App.jsx */}
-                <button
-                    className="room-button glass-surface glass-ripple glass-button living-room-button"
-                    onClick={() => setupRoomCreation("Living Room", livingRoomUrl)}
-                >
-                    Living Room
-                </button>
-
-                {/* set activeRoom to Kitchen, rendering it in App.jsx */}
-                <button
-                    className="room-button glass-surface glass-ripple glass-button kitchen-button"
-                    onClick={() => setupRoomCreation("Kitchen", kitchenUrl)}
-                >
-                    Kitchen
-                </button>
-
-                {/* set activeRoom to Bathroom, rendering it in App.jsx */}
-                <button
-                    className="room-button glass-surface glass-ripple glass-button bathroom-button"
-                    onClick={() => setupRoomCreation("Bathroom", bathroomUrl)}
-                >
-                    Bathroom
-                </button>
+                {/* Preset background cards; the chosen one glows */}
+                {[
+                    { name: "Bedroom", url: bedroomUrl },
+                    { name: "Living Room", url: livingRoomUrl },
+                    { name: "Kitchen", url: kitchenUrl },
+                    { name: "Bathroom", url: bathroomUrl },
+                ].map((preset) => (
+                    <button
+                        key={preset.name}
+                        className={
+                            "room-card glass-surface glass-ripple glass-button" +
+                            (roomCreation.imgSrc === preset.url ? " chosen" : "")
+                        }
+                        onClick={() => setupRoomCreation(preset.name, preset.url)}
+                    >
+                        <span
+                            className="room-card-thumb"
+                            style={{ backgroundImage: `url("${preset.url}")` }}
+                        />
+                        <span className="room-card-name">{preset.name}</span>
+                    </button>
+                ))}
 
                 <div
                     className="room-creator glass-surface"

@@ -170,7 +170,7 @@ export default function LoadRoomScreen({ isOpen, onClose, onCloseLoad }) {
           <button
             key={room.id}
             className={
-              "load-room-card glass-surface glass-glow glass-button" +
+              "room-card glass-surface glass-glow glass-button" +
               (selectMode && selectedIds.includes(room.id) ? " selected" : "")
             }
             onClick={() =>
@@ -178,12 +178,12 @@ export default function LoadRoomScreen({ isOpen, onClose, onCloseLoad }) {
             }
           >
             <span
-              className="load-room-thumb"
+              className="room-card-thumb"
               style={{
                 backgroundImage: !room.imgSrc || room.imgSrc === "none" ? "none" : `url("${room.imgSrc}")`,
               }}
             />
-            <span className="load-room-name">{room.name}</span>
+            <span className="room-card-name">{room.name}</span>
           </button>
         ))}
       </div>
