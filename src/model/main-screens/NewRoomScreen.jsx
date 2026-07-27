@@ -69,7 +69,7 @@ export default function NewRoomScreen({ isOpen, onClose, onGoHome, openImagePick
     return (
         <div>
             <button
-                className="back-button glass-surface glass-glow glass-ripple glass-button"
+                className="back-button glass-surface glass-glow glass-button"
                 onClick={onGoHome}
                 aria-label="Back to home"
             >
