@@ -1,0 +1,423 @@
+/*
+ * Reusable glass component layouts.
+ *
+ * These classes build on Glass.css. They handle common controls,
+ * textareas, rows, overlays, notifications, and close handles.
+ *
+ * Existing Menu class names are included as aliases, so Menu.jsx
+ * does not need to be changed immediately.
+ */
+
+/* ------------------------------------------------------------ */
+/* Glass controls                                                */
+/* ------------------------------------------------------------ */
+
+.glass-control,
+.menu-action {
+	--glass-surface-background:
+		var(--glass-control-background, rgba(225, 235, 245, 0.035));
+
+	--glass-hover-background:
+		var(--glass-control-hover-background, rgba(245, 250, 255, 0.1));
+
+	position: relative;
+	display: block;
+
+	width: var(--glass-control-width, 100%);
+	min-height: var(--glass-control-min-height, 39px);
+	padding: var(--glass-control-padding, 8px 10px);
+
+	box-sizing: border-box;
+	border-radius: var(--glass-control-radius, 11px);
+
+	font: inherit;
+	font-size: var(--glass-control-font-size, 14px);
+	font-weight: var(--glass-control-font-weight, 550);
+	color: var(--glass-text);
+}
+
+/*
+ * Keeps text created with ::before, such as Undo and Redo,
+ * above the click ripple.
+ */
+.glass-control::before,
+.menu-action::before {
+	position: relative;
+	z-index: 3;
+}
+
+/* ------------------------------------------------------------ */
+/* Glass input container                                         */
+/* ------------------------------------------------------------ */
+
+.glass-input-shell,
+.menu-input-ripple {
+	border-radius: var(--glass-input-radius, 12px);
+}
+
+.glass-input-shell:focus-within,
+.menu-input-ripple:focus-within {
+	background:
+		linear-gradient(
+			135deg,
+			rgba(255, 255, 255, 0.19),
+			rgba(255, 255, 255, 0.025)
+		),
+		var(--glass-background-hover);
+
+	border-color: var(--glass-border-hover);
+
+	box-shadow:
+		inset 0 1px 1px rgba(255, 255, 255, 0.45),
+		0 0 0 2px rgba(255, 255, 255, 0.18),
+		0 8px 20px rgba(5, 12, 22, 0.18),
+		0 0
+			var(--glass-glow-size)
+			var(--glass-glow-spread)
+			rgb(
+				var(--glass-glow-color) /
+				var(--glass-glow-strength)
+			);
+}
+
+/* ------------------------------------------------------------ */
+/* Glass textarea                                                */
+/* ------------------------------------------------------------ */
+
+.glass-textarea,
+.menu-name-input {
+	position: relative;
+	z-index: 3;
+
+	display: block;
+
+	width: 100%;
+	min-height: var(--glass-textarea-min-height, 54px);
+	max-height: var(--glass-textarea-max-height, 90px);
+	padding: var(--glass-textarea-padding, 9px 12px);
+
+	box-sizing: border-box;
+
+	font: inherit;
+	font-size: var(--glass-textarea-font-size, 15px);
+	font-weight: var(--glass-textarea-font-weight, 600);
+	line-height: var(--glass-textarea-line-height, 1.25);
+	color: var(--glass-text);
+
+	background: var(
+		--glass-textarea-background,
+		rgba(255, 255, 255, 0.025)
+	);
+
+	border: 0;
+	border-radius: var(--glass-input-radius, 12px);
+	outline: none;
+
+	resize: none;
+
+	white-space: pre-wrap;
+	overflow-wrap: normal;
+	word-break: normal;
+
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+.glass-textarea::selection,
+.menu-name-input::selection {
+	background: var(
+		--glass-text-selection,
+		rgba(120, 170, 230, 0.35)
+	);
+}
+
+/* ------------------------------------------------------------ */
+/* Reusable button rows                                          */
+/* ------------------------------------------------------------ */
+
+.glass-button-row,
+.menu-room-actions,
+.menu-arrows,
+.menu-sure-actions {
+	display: flex;
+	gap: var(--glass-control-gap, 9px);
+}
+
+.glass-button-row > *,
+.menu-room-actions > *,
+.menu-arrows > *,
+.menu-sure-actions > * {
+	flex: 1;
+	min-width: 0;
+}
+
+/* ------------------------------------------------------------ */
+/* Popup overlay                                                 */
+/* ------------------------------------------------------------ */
+
+.glass-overlay,
+.menu-sure {
+	position: absolute;
+	inset: var(--glass-overlay-inset, 12px);
+	z-index: var(--glass-overlay-z-index, 20);
+
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	gap: var(--glass-overlay-gap, 7px);
+
+	padding: var(--glass-overlay-padding, 16px);
+	box-sizing: border-box;
+
+	border-radius: var(--glass-overlay-radius, 15px);
+
+	animation:
+		glass-component-popup
+		var(--glass-popup-duration, 420ms)
+		ease-out;
+}
+
+/* ------------------------------------------------------------ */
+/* Overlay covering an existing row                              */
+/* ------------------------------------------------------------ */
+
+.glass-cover-overlay,
+.menu-coming-soon {
+	position: absolute;
+	inset: 0;
+	z-index: var(--glass-cover-z-index, 8);
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	border-radius: var(--glass-cover-radius, 11px);
+
+	font-size: var(--glass-cover-font-size, 13px);
+	font-weight: var(--glass-cover-font-weight, 650);
+	color: var(--glass-text);
+
+	animation:
+		glass-component-popup
+		var(--glass-cover-duration, 380ms)
+		ease-out;
+}
+
+/* ------------------------------------------------------------ */
+/* Popup displayed beside a control                              */
+/* ------------------------------------------------------------ */
+
+.glass-inline-popup,
+.menu-saved-popup {
+	position: absolute;
+
+	left: calc(100% + var(--glass-inline-popup-gap, 10px));
+	top: 50%;
+	z-index: var(--glass-inline-popup-z-index, 30);
+
+	width: max-content;
+	padding: var(--glass-inline-popup-padding, 8px 12px);
+
+	border-radius: var(--glass-inline-popup-radius, 11px);
+
+	font-size: var(--glass-inline-popup-font-size, 13px);
+	font-weight: var(--glass-inline-popup-font-weight, 650);
+	white-space: nowrap;
+
+	transform: translateY(-50%);
+	pointer-events: none;
+
+	animation:
+		glass-inline-popup-enter
+		var(--glass-inline-popup-duration, 300ms)
+		ease-out;
+}
+
+/* ------------------------------------------------------------ */
+/* Reusable bottom close section                                 */
+/* ------------------------------------------------------------ */
+
+.glass-close-zone,
+.menu-close-zone {
+	position: relative;
+
+	height: var(--glass-close-zone-height, 34px);
+	margin: var(--glass-close-zone-margin, 0);
+	padding: var(--glass-close-zone-padding, 4px 12px 8px);
+
+	overflow: hidden;
+	box-sizing: border-box;
+
+	border-radius:
+		0
+		0
+		var(--glass-close-zone-radius, 20px)
+		var(--glass-close-zone-radius, 20px);
+
+	border-top:
+		1px solid
+		var(
+			--glass-close-zone-border,
+			rgba(255, 255, 255, 0.09)
+		);
+
+	background:
+		linear-gradient(
+			180deg,
+			rgba(255, 255, 255, 0.025),
+			rgba(215, 228, 240, 0.08)
+		);
+
+	-webkit-backdrop-filter:
+		blur(var(--glass-blur))
+		saturate(var(--glass-saturation));
+
+	backdrop-filter:
+		blur(var(--glass-blur))
+		saturate(var(--glass-saturation));
+
+	box-shadow:
+		inset 0 -1px 1px rgba(255, 255, 255, 0.12),
+		0 -4px 10px rgba(5, 12, 22, 0.025);
+
+	transform-origin: bottom center;
+}
+
+.glass-close-zone:hover,
+.menu-close-zone:hover {
+	animation:
+		glass-close-zone-bob
+		var(--glass-close-bob-duration, 650ms)
+		ease-in-out
+		infinite;
+}
+
+/* ------------------------------------------------------------ */
+/* Reusable close button and handle                              */
+/* ------------------------------------------------------------ */
+
+.glass-close-button,
+.menu-close-button {
+	position: relative;
+	z-index: 2;
+
+	display: block;
+
+	width: 100%;
+	height: var(--glass-close-button-height, 22px);
+	padding: 0;
+
+	background: transparent;
+	border: 0;
+
+	cursor: pointer;
+}
+
+.glass-close-button > span,
+.menu-close-button > span {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+
+	width: var(--glass-close-handle-width, 58px);
+	height: var(--glass-close-handle-height, 5px);
+
+	background: var(
+		--glass-close-handle-background,
+		rgba(45, 54, 65, 0.48)
+	);
+
+	border:
+		1px solid
+		var(
+			--glass-close-handle-border,
+			rgba(255, 255, 255, 0.3)
+		);
+
+	border-radius: 999px;
+
+	transform: translate(-50%, -50%);
+
+	box-shadow:
+		inset 0 1px 1px rgba(255, 255, 255, 0.4),
+		0 2px 5px rgba(5, 12, 22, 0.16);
+
+	transition:
+		width 180ms ease,
+		background-color 180ms ease;
+}
+
+.glass-close-zone:hover .glass-close-button > span,
+.menu-close-zone:hover .menu-close-button > span {
+	width: var(--glass-close-handle-hover-width, 76px);
+
+	background: var(
+		--glass-close-handle-hover-background,
+		rgba(35, 44, 55, 0.62)
+	);
+}
+
+/* ------------------------------------------------------------ */
+/* Shared component animations                                   */
+/* ------------------------------------------------------------ */
+
+@keyframes glass-component-popup {
+	0% {
+		transform: scale(0.82);
+		opacity: 0;
+		filter: blur(5px);
+	}
+
+	65% {
+		transform: scale(1.035);
+		opacity: 1;
+		filter: blur(0);
+	}
+
+	100% {
+		transform: scale(1);
+		opacity: 1;
+		filter: blur(0);
+	}
+}
+
+@keyframes glass-inline-popup-enter {
+	0% {
+		opacity: 0;
+
+		transform:
+			translate(-8px, -50%)
+			scale(0.88);
+	}
+
+	65% {
+		opacity: 1;
+
+		transform:
+			translate(2px, -50%)
+			scale(1.03);
+	}
+
+	100% {
+		opacity: 1;
+
+		transform:
+			translate(0, -50%)
+			scale(1);
+	}
+}
+
+@keyframes glass-close-zone-bob {
+	0%,
+	100% {
+		transform:
+			translateY(0)
+			scaleY(1);
+	}
+
+	50% {
+		transform:
+			translateY(-5px)
+			scaleY(0.9);
+	}
+}

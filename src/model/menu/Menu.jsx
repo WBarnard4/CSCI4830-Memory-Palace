@@ -170,21 +170,6 @@ export function Menu({ menuName, updateMenuName, saveRoom, loadRoom, newRoom, se
 		}
 	}
 
-	function suppressHoverRipple(event) {
-		event.currentTarget.classList.add("menu-ripple-clicked");
-	}
-
-	function restoreHoverRipple(event) {
-		event.currentTarget.classList.remove("menu-ripple-clicked");
-	}
-
-	const rippleHandlers = {
-		onPointerDown: suppressHoverRipple,
-		onPointerLeave: restoreHoverRipple,
-		onPointerCancel: restoreHoverRipple,
-	};
-
-
 	return (
 		<div
 			ref={menuRef}
@@ -192,13 +177,33 @@ export function Menu({ menuName, updateMenuName, saveRoom, loadRoom, newRoom, se
 		>
 			{opened ? (
 				<div
-					className={`menu-panel${closing ? " menu-closing" : ""}`}
+					className={
+						`menu-panel ` +
+						`menu-transition-panel ` +
+						`menu-transition-from-left ` +
+						`glass-surface` +
+						(closing
+							? " menu-transition-closing"
+							: "")
+					}
 					onAnimationEnd={finishMenuAnimation}
 				>
-					<div className="menu-opened">
+					<span
+						className={
+							"menu-transition-icon " +
+							"menu-transition-hamburger"
+						}
+						aria-hidden="true"
+					/>
+
+					<div className="menu-opened menu-transition-content">
 						<div
-							className="menu-input-ripple"
-							{...rippleHandlers}
+							className={
+								"menu-input-ripple " +
+								"glass-surface " +
+								"glass-glow " +
+								"glass-ripple"
+							}
 						>
 							<textarea
 								key={menuName}
@@ -213,24 +218,39 @@ export function Menu({ menuName, updateMenuName, saveRoom, loadRoom, newRoom, se
 						</div>
 
 						<button
-							className="menu-action"
+							className={
+								"menu-action " +
+								"glass-surface " +
+								"glass-glow " +
+								"glass-ripple " +
+								"glass-button"
+							}
 							onClick={setBackgroundImage}
-							{...rippleHandlers}
 						>
 							Choose Background
 						</button>
 
 						<div className="menu-save-row">
 							<button
-								className="menu-action"
+								className={
+									"menu-action " +
+									"glass-surface " +
+									"glass-glow " +
+									"glass-ripple " +
+									"glass-button"
+								}
 								onClick={saveWithFeedback}
-								{...rippleHandlers}
 							>
 								Save Room
 							</button>
 
 							{showSavedPopup && (
-								<div className="menu-saved-popup">
+								<div
+									className={
+										"menu-saved-popup " +
+										"glass-surface"
+									}
+								>
 									Room saved
 								</div>
 							)}
@@ -238,17 +258,31 @@ export function Menu({ menuName, updateMenuName, saveRoom, loadRoom, newRoom, se
 
 						<div className="menu-room-actions">
 							<button
-								className="menu-action"
-								onClick={() => verifyWithPopup(loadRoom)}
-								{...rippleHandlers}
+								className={
+									"menu-action " +
+									"glass-surface " +
+									"glass-glow " +
+									"glass-ripple " +
+									"glass-button"
+								}
+								onClick={() =>
+									verifyWithPopup(loadRoom)
+								}
 							>
 								Load Room
 							</button>
 
 							<button
-								className="menu-action"
-								onClick={() => verifyWithPopup(newRoom)}
-								{...rippleHandlers}
+								className={
+									"menu-action " +
+									"glass-surface " +
+									"glass-glow " +
+									"glass-ripple " +
+									"glass-button"
+								}
+								onClick={() =>
+									verifyWithPopup(newRoom)
+								}
 							>
 								New Room
 							</button>
@@ -256,30 +290,54 @@ export function Menu({ menuName, updateMenuName, saveRoom, loadRoom, newRoom, se
 
 						<div className="menu-arrows">
 							<button
-								className="menu-action menu-arrow-left"
+								className={
+									"menu-action " +
+									"menu-arrow-left " +
+									"glass-surface " +
+									"glass-glow " +
+									"glass-ripple " +
+									"glass-button"
+								}
 								aria-label="Undo"
 								onClick={undoComingSoon}
-								{...rippleHandlers}
 							/>
 
 							<button
-								className="menu-action menu-arrow-right"
+								className={
+									"menu-action " +
+									"menu-arrow-right " +
+									"glass-surface " +
+									"glass-glow " +
+									"glass-ripple " +
+									"glass-button"
+								}
 								aria-label="Redo"
 								onClick={redoComingSoon}
-								{...rippleHandlers}
 							/>
 
 							{comingSoon && (
-								<div className="menu-coming-soon">
+								<div
+									className={
+										"menu-coming-soon " +
+										"glass-surface"
+									}
+								>
 									Coming soon!
 								</div>
 							)}
 						</div>
 
 						<button
-							className="menu-action"
-							onClick={() => verifyWithPopup(goHome)}
-							{...rippleHandlers}
+							className={
+								"menu-action " +
+								"glass-surface " +
+								"glass-glow " +
+								"glass-ripple " +
+								"glass-button"
+							}
+							onClick={() =>
+								verifyWithPopup(goHome)
+							}
 						>
 							Home
 						</button>
@@ -296,23 +354,33 @@ export function Menu({ menuName, updateMenuName, saveRoom, loadRoom, newRoom, se
 					</div>
 
 					{areYouSurePopup && (
-						<div className="menu-sure">
+						<div className="menu-sure glass-surface">
 							<h2>Are You Sure?</h2>
 							<h3>Data May Be Lost</h3>
 
 							<div className="menu-sure-actions">
 								<button
-									className="menu-action"
+									className={
+										"menu-action " +
+										"glass-surface " +
+										"glass-glow " +
+										"glass-ripple " +
+										"glass-button"
+									}
 									onClick={areYouSureYes}
-									{...rippleHandlers}
 								>
 									Yes
 								</button>
 
 								<button
-									className="menu-action"
+									className={
+										"menu-action " +
+										"glass-surface " +
+										"glass-glow " +
+										"glass-ripple " +
+										"glass-button"
+									}
 									onClick={areYouSureNo}
-									{...rippleHandlers}
 								>
 									No
 								</button>
@@ -323,10 +391,15 @@ export function Menu({ menuName, updateMenuName, saveRoom, loadRoom, newRoom, se
 			) : (
 				<button
 					type="button"
-					className="menu-closed"
+					className={
+						"menu-closed " +
+						"glass-surface " +
+						"glass-glow " +
+						"glass-ripple " +
+						"glass-button"
+					}
 					aria-label="Open menu"
 					onClick={openMenu}
-					{...rippleHandlers}
 				/>
 			)}
 		</div>

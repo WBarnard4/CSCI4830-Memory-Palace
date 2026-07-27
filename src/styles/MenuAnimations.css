@@ -1,0 +1,409 @@
+/*
+ * Reusable expanding-menu animation.
+ *
+ * Override these variables on an individual menu panel:
+ *
+ * --menu-open-width
+ * --menu-closed-size
+ * --menu-collapse-width
+ * --menu-open-radius
+ * --menu-open-duration
+ * --menu-close-duration
+ * --menu-content-open-delay
+ */
+
+.menu-transition-panel {
+	/* Size */
+	--menu-open-width: 250px;
+	--menu-closed-size: 54px;
+	--menu-collapse-width: 4px;
+
+	/* Shape */
+	--menu-closed-radius: 999px;
+	--menu-line-radius: 3px;
+	--menu-open-radius: 20px;
+
+	/* Timing */
+	--menu-open-duration: 450ms;
+	--menu-close-duration: 425ms;
+
+	--menu-content-open-duration: 100ms;
+	--menu-content-open-delay: 350ms;
+	--menu-content-close-duration: 70ms;
+
+	/* Icon */
+	--menu-transition-icon-opacity: 0.92;
+
+	/*
+	 * Left-origin defaults.
+	 *
+	 * These are overridden by the center and right classes.
+	 */
+	--menu-closed-left: 0px;
+	--menu-closed-right:
+		calc(100% - var(--menu-closed-size));
+
+	--menu-line-left:
+		calc(
+			(
+				var(--menu-closed-size) -
+				var(--menu-collapse-width)
+			) / 2
+		);
+
+	--menu-line-right:
+		calc(
+			100% -
+				(
+					(
+						var(--menu-closed-size) +
+							var(--menu-collapse-width)
+					) / 2
+				)
+		);
+
+	--menu-icon-center-x:
+		calc(var(--menu-closed-size) / 2);
+
+	position: relative;
+	width: var(--menu-open-width);
+
+	transform-origin:
+		var(--menu-icon-center-x)
+		calc(var(--menu-closed-size) / 2);
+
+	/*
+	 * "backwards" applies the first keyframe immediately but does
+	 * not leave clip-path active after the animation finishes.
+	 */
+	animation:
+		menu-panel-open
+		var(--menu-open-duration)
+		cubic-bezier(0.2, 0.8, 0.25, 1)
+		backwards;
+}
+
+/* Open or close from the left edge */
+.menu-transition-from-left {
+	--menu-closed-left: 0px;
+	--menu-closed-right:
+		calc(100% - var(--menu-closed-size));
+
+	--menu-line-left:
+		calc(
+			(
+				var(--menu-closed-size) -
+					var(--menu-collapse-width)
+			) / 2
+		);
+
+	--menu-line-right:
+		calc(
+			100% -
+				(
+					(
+						var(--menu-closed-size) +
+							var(--menu-collapse-width)
+					) / 2
+				)
+		);
+
+	--menu-icon-center-x:
+		calc(var(--menu-closed-size) / 2);
+}
+
+/* Open or close equally from the center */
+.menu-transition-from-center {
+	--menu-closed-left:
+		calc(
+			(100% - var(--menu-closed-size)) / 2
+		);
+
+	--menu-closed-right:
+		calc(
+			(100% - var(--menu-closed-size)) / 2
+		);
+
+	--menu-line-left:
+		calc(
+			(100% - var(--menu-collapse-width)) / 2
+		);
+
+	--menu-line-right:
+		calc(
+			(100% - var(--menu-collapse-width)) / 2
+		);
+
+	--menu-icon-center-x: 50%;
+}
+
+/* Open or close from the right edge */
+.menu-transition-from-right {
+	--menu-closed-left:
+		calc(100% - var(--menu-closed-size));
+
+	--menu-closed-right: 0px;
+
+	--menu-line-left:
+		calc(
+			100% -
+				(
+					(
+						var(--menu-closed-size) +
+							var(--menu-collapse-width)
+					) / 2
+				)
+		);
+
+	--menu-line-right:
+		calc(
+			(
+				var(--menu-closed-size) -
+					var(--menu-collapse-width)
+			) / 2
+		);
+
+	--menu-icon-center-x:
+		calc(
+			100% -
+				(var(--menu-closed-size) / 2)
+		);
+}
+
+/* Reverse animation */
+.menu-transition-panel.menu-transition-closing {
+	pointer-events: none;
+
+	animation:
+		menu-panel-close
+		var(--menu-close-duration)
+		cubic-bezier(0.2, 0.8, 0.25, 1)
+		both;
+}
+
+/* Reusable transition icon position */
+.menu-transition-icon {
+	position: absolute;
+	left: var(--menu-icon-center-x);
+	top: calc(var(--menu-closed-size) / 2);
+	z-index: 50;
+
+	transform: translate(-50%, -50%) scaleX(1);
+	opacity: 0;
+
+	pointer-events: none;
+
+	animation:
+		menu-icon-open
+		var(--menu-open-duration)
+		ease
+		backwards;
+}
+
+.menu-transition-panel.menu-transition-closing
+	.menu-transition-icon {
+	animation:
+		menu-icon-close
+		var(--menu-close-duration)
+		ease
+		both;
+}
+
+/* Reusable menu-content entrance */
+.menu-transition-content {
+	animation:
+		menu-content-appear
+		var(--menu-content-open-duration)
+		ease-out
+		var(--menu-content-open-delay)
+		both;
+}
+
+.menu-transition-panel.menu-transition-closing
+	.menu-transition-content {
+	animation:
+		menu-content-disappear
+		var(--menu-content-close-duration)
+		ease-in
+		both;
+}
+
+/*
+ * Opening:
+ * 1. Closed shape collapses sideways into a tall line.
+ * 2. The line briefly remains collapsed.
+ * 3. It expands horizontally.
+ * 4. It quickly expands downward.
+ */
+@keyframes menu-panel-open {
+	0% {
+		clip-path: inset(
+			0
+			var(--menu-closed-right)
+			calc(100% - var(--menu-closed-size))
+			var(--menu-closed-left)
+			round var(--menu-closed-radius)
+		);
+	}
+
+	18% {
+		clip-path: inset(
+			0
+			var(--menu-line-right)
+			calc(100% - var(--menu-closed-size))
+			var(--menu-line-left)
+			round var(--menu-line-radius)
+		);
+	}
+
+	30% {
+		clip-path: inset(
+			0
+			var(--menu-line-right)
+			calc(100% - var(--menu-closed-size))
+			var(--menu-line-left)
+			round var(--menu-line-radius)
+		);
+	}
+
+	76% {
+		clip-path: inset(
+			0
+			0
+			calc(100% - var(--menu-closed-size))
+			0
+			round var(--menu-open-radius)
+		);
+	}
+
+	100% {
+		clip-path: inset(
+			0
+			round var(--menu-open-radius)
+		);
+	}
+}
+
+/* Closing performs the same animation in reverse */
+@keyframes menu-panel-close {
+	0% {
+		clip-path: inset(
+			0
+			round var(--menu-open-radius)
+		);
+	}
+
+	24% {
+		clip-path: inset(
+			0
+			0
+			calc(100% - var(--menu-closed-size))
+			0
+			round var(--menu-open-radius)
+		);
+	}
+
+	70% {
+		clip-path: inset(
+			0
+			var(--menu-line-right)
+			calc(100% - var(--menu-closed-size))
+			var(--menu-line-left)
+			round var(--menu-line-radius)
+		);
+	}
+
+	82% {
+		clip-path: inset(
+			0
+			var(--menu-line-right)
+			calc(100% - var(--menu-closed-size))
+			var(--menu-line-left)
+			round var(--menu-line-radius)
+		);
+	}
+
+	100% {
+		clip-path: inset(
+			0
+			var(--menu-closed-right)
+			calc(100% - var(--menu-closed-size))
+			var(--menu-closed-left)
+			round var(--menu-closed-radius)
+		);
+	}
+}
+
+/* Transition icon collapses sideways */
+@keyframes menu-icon-open {
+	0% {
+		opacity: var(--menu-transition-icon-opacity);
+		transform:
+			translate(-50%, -50%)
+			scaleX(1);
+	}
+
+	18% {
+		opacity: 0.75;
+		transform:
+			translate(-50%, -50%)
+			scaleX(0.06);
+	}
+
+	30%,
+	100% {
+		opacity: 0;
+		transform:
+			translate(-50%, -50%)
+			scaleX(0.06);
+	}
+}
+
+/* Transition icon returns when closing */
+@keyframes menu-icon-close {
+	0%,
+	70% {
+		opacity: 0;
+		transform:
+			translate(-50%, -50%)
+			scaleX(0.06);
+	}
+
+	82% {
+		opacity: 0.65;
+		transform:
+			translate(-50%, -50%)
+			scaleX(0.06);
+	}
+
+	100% {
+		opacity: var(--menu-transition-icon-opacity);
+		transform:
+			translate(-50%, -50%)
+			scaleX(1);
+	}
+}
+
+@keyframes menu-content-appear {
+	from {
+		opacity: 0;
+		transform: translateY(-8px);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes menu-content-disappear {
+	from {
+		opacity: 1;
+		transform: translateY(0);
+	}
+
+	to {
+		opacity: 0;
+		transform: translateY(-8px);
+	}
+}
