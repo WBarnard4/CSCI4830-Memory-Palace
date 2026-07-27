@@ -22,7 +22,9 @@ export default function NewRoomScreen({ isOpen, onClose, onGoHome, openImagePick
     if (isOpen != HOME_STATES.NEW) return null;
 
     function setupRoomCreation(name, imgSrc) {
-        setRoomCreation({ imgSrc: imgSrc, name: name })
+        // Preset backgrounds have no stored image, so clear any
+        // previously picked imageId instead of silently dropping it.
+        setRoomCreation({ ...roomCreation, imgSrc: imgSrc, imageId: null, name: name })
     }
 
     function createRoom() {
@@ -41,16 +43,25 @@ export default function NewRoomScreen({ isOpen, onClose, onGoHome, openImagePick
     }
 
     function newNameEntered(event) {
-        if (event.key != "Enter") {
+        // Commit on Enter OR when the field loses focus, so clicking
+        // "Create Room" directly still saves the typed name.
+        if (event.key !== "Enter" && event.type !== "blur") {
             return;
         }
 
-        if (!isValidRoomName(event.target.value)) {
-            event.target.value = DEFAULT_NAME;
+        if (event.key === "Enter") {
+            event.preventDefault();
+        }
+
+        const newName = event.target.value.trim();
+
+        if (!isValidRoomName(newName)) {
+            event.target.value = roomCreation.name;
+            event.target.blur();
             return;
         }
 
-        setRoomCreation({ ...roomCreation, name: event.target.value })
+        setRoomCreation({ ...roomCreation, name: newName })
         event.target.blur();
     }
 
@@ -58,10 +69,11 @@ export default function NewRoomScreen({ isOpen, onClose, onGoHome, openImagePick
     return (
         <div>
             <button
-                className="room-button glass-surface glass-glow glass-button"
+                className="back-button glass-surface glass-glow glass-ripple glass-button"
                 onClick={onGoHome}
+                aria-label="Back to home"
             >
-                Home
+                &#8592;
             </button>
             <div className="room-grid">
                 {/* set activeRoom to Bedroom, rendering it in App.jsx */}
@@ -108,6 +120,7 @@ export default function NewRoomScreen({ isOpen, onClose, onGoHome, openImagePick
                         className="glass-surface glass-glow glass-ripple"
                     >
                         <textarea
+                            key={roomCreation.name}
                             className="glass-textarea"
                             defaultValue={roomCreation.name}
                             rows="2"

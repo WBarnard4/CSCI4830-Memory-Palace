@@ -35,10 +35,14 @@ export async function createRoom(name, imageId, imgSrc) {
 }
 
 export async function getAllRooms() {
-  const rooms = await db.rooms.toArray();
+  // Newest first: ids auto-increment, so a higher id means the
+  // room was created later.
+  const rooms = await db.rooms.orderBy("id").reverse().toArray();
   for (let i = 0; i < rooms.length; i++) {
     const imageId = rooms[i].imageId ?? null;
-    const imgSrc = imageId ? await getImageUrl(imageId) : null;
+    // Custom backgrounds: mint a fresh blob URL from the stored image.
+    // Preset backgrounds have no imageId, so fall back to the stored asset URL.
+    const imgSrc = imageId ? await getImageUrl(imageId) : (rooms[i].imgSrc ?? null);
     rooms[i] = {
       ...rooms[i],
       imageId: imageId,
@@ -60,11 +64,12 @@ export async function saveRoom(roomData, ideas) {
 
     // First save: room doesn't exist in the DB yet
     if (roomId == null) {
-      roomId = createRoom(roomData.name, roomData.imageId, roomData.imgSrc);
+      roomId = await createRoom(roomData.name, roomData.imageId, roomData.imgSrc);
     } else {
       await db.rooms.update(roomId, {
         name: roomData.name,
         imageId: roomData.imageId ?? null,
+        imgSrc: roomData.imgSrc ?? null,
       });
     }
 
@@ -76,6 +81,9 @@ export async function saveRoom(roomData, ideas) {
         type: idea.type,
         x: idea.x,
         y: idea.y,
+        w: idea.w ?? null,
+        h: idea.h ?? null,
+        r: idea.r ?? null,
         text: idea.text ?? null,
         imageId: idea.imageId ?? null,
       });
@@ -84,13 +92,42 @@ export async function saveRoom(roomData, ideas) {
     return roomId;
   });
 }
+export async function deleteRoom(roomId) {
+  return db.transaction("rw", db.rooms, db.ideas, db.images, async () => {
+    const room = await db.rooms.get(roomId);
+    if (!room) {
+      return;
+    }
+
+    const ideas = await db.ideas.where("roomId").equals(roomId).toArray();
+
+    // Clean up stored image blobs owned by this room. Images are
+    // never shared between rooms (every pick creates a new record),
+    // so deleting them here cannot break other rooms.
+    const imageIds = ideas
+      .map((idea) => idea.imageId)
+      .filter((imageId) => imageId != null);
+
+    if (room.imageId != null) {
+      imageIds.push(room.imageId);
+    }
+
+    if (imageIds.length > 0) {
+      await db.images.bulkDelete(imageIds);
+    }
+
+    await db.ideas.where("roomId").equals(roomId).delete();
+    await db.rooms.delete(roomId);
+  });
+}
+
 export async function loadRoom(roomId) {
   const room = await db.rooms.get(roomId);
   if (!room) return null;
 
   const ideas = await db.ideas.where("roomId").equals(roomId).toArray();
   const imageId = room.imageId ?? null;
-  const imgSrc = imageId ? await getImageUrl(imageId) : null;
+  const imgSrc = imageId ? await getImageUrl(imageId) : (room.imgSrc ?? null);
 
   return {
     id: room.id,

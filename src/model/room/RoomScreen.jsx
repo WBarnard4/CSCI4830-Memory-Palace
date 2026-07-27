@@ -349,6 +349,9 @@ export default function RoomScreen({ roomData, updateRoomData, openImagePicker, 
                 type={idea.type}
                 x={idea.x}
                 y={idea.y}
+                w={idea.w}
+                h={idea.h}
+                r={idea.r}
                 text={idea.text}
                 imageId={idea.imageId}
                 imageSrc={idea.imageSrc}
@@ -362,6 +365,8 @@ export default function RoomScreen({ roomData, updateRoomData, openImagePicker, 
                 isFirst={index === 0}
                 isLast={index === ideas.length - 1}
                 openImagePicker={openImagePicker}
+                roomRef={roomRef}
+                roomBaseDimensions={baseRoomDimensions}
                 key={idea.id}>
               </Idea>
             );

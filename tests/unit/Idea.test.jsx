@@ -12,6 +12,40 @@ let ideaProps;
 
 const bathroomImage = "../../src/assets/generic_bathroom.jpg";
 
+/**
+ * Ideas open their editor on a click (pointer down + up with no
+ * movement between) and move/resize/rotate via pointer drags, so
+ * tests interact through pointer events rather than click events.
+ */
+function pointerClick(element) {
+	fireEvent.pointerDown(element, { button: 0, pointerId: 1 });
+	fireEvent.pointerUp(element, { button: 0, pointerId: 1 });
+}
+
+/**
+ * Fake room the Idea converts pointer pixels into percentages
+ * with: 1000x500 base pixels, positioned at the page origin.
+ */
+const fakeRoomRef = {
+	current: {
+		getBoundingClientRect: () => ({
+			width: 1000,
+			height: 500,
+			left: 0,
+			top: 0,
+		}),
+		offsetWidth: 1000,
+		offsetHeight: 500,
+	},
+};
+
+const fakeRoomBase = { width: 1000, height: 500 };
+
+/** The styled idea box is the parent of the text span / image. */
+function getIdeaBox(childElement) {
+	return childElement.parentElement;
+}
+
 beforeEach(() => {
 	// Idea Arguments
 	ideaProps = {
@@ -28,6 +62,8 @@ beforeEach(() => {
 		updateIdea: vi.fn(),
 		deleteIdea: vi.fn(),
 		openImagePicker: vi.fn(),
+		roomRef: fakeRoomRef,
+		roomBaseDimensions: fakeRoomBase,
 	};
 });
 
@@ -40,28 +76,35 @@ afterEach(() => {
 describe("Idea Unit Tests", () => {
 	// Ensure all information provided to the Idea is displayed correctly
 	it("Idea Information is Displayed Correctly", () => {
-		// Update the Idea to be an image with an ID from the DB
-		ideaProps = {
-			...ideaProps,
-			type: "image",
-			imageId: 10,
-			imageSrc: bathroomImage,
-		};
-
+		// Text idea displays its text at the right position
 		render(<Idea {...ideaProps} />);
 
-		const idea = screen.getByText("Test Idea");
-		const image = screen.getByRole("img", { name: "User idea" });
+		const textBox = getIdeaBox(screen.getByText("Test Idea"));
+		expect(textBox).toHaveStyle("left: 25%");
+		expect(textBox).toHaveStyle("top: 40%");
+		expect(textBox).toHaveStyle("z-index: 3");
 
-		// Idea text and image are present
-		expect(idea).toBeInTheDocument();
+		cleanup();
+
+		// Image idea displays its image; text is not rendered for
+		// image ideas.
+		render(
+			<Idea
+				{...ideaProps}
+				type="image"
+				imageId={10}
+				imageSrc={bathroomImage}
+			/>
+		);
+
+		const image = screen.getByRole("img", { name: "User idea" });
 		expect(image).toBeInTheDocument();
 		expect(image).toHaveAttribute("src", bathroomImage);
+		expect(screen.queryByText("Test Idea")).not.toBeInTheDocument();
 
-		// Idea position is correct
-		expect(idea).toHaveStyle("left: 25%");
-		expect(idea).toHaveStyle("top: 40%");
-		expect(idea).toHaveStyle("z-index: 3");
+		const imageBox = getIdeaBox(image);
+		expect(imageBox).toHaveStyle("left: 25%");
+		expect(imageBox).toHaveStyle("top: 40%");
 	});
 
 	// Text Idea callbacks work properly
@@ -72,11 +115,9 @@ describe("Idea Unit Tests", () => {
 		expect(ideaProps.updateIdea).not.toHaveBeenCalled();
 		expect(ideaProps.deleteIdea).not.toHaveBeenCalled();
 
-		// Open Idea editing menu
-		fireEvent.click(screen.getByText("Test Idea"));
+		// Open Idea editing menu (pointer click, no movement)
+		pointerClick(screen.getByText("Test Idea"));
 
-		const posXInput = container.querySelector('input[name="posX"]');
-		const posYInput = container.querySelector('input[name="posY"]');
 		const textInput = container.querySelector('textarea[name="text"]');
 
 		// Highlight calls the updateIdea callback with highlighted set to true
@@ -87,6 +128,9 @@ describe("Idea Unit Tests", () => {
 			type: "text",
 			x: 25,
 			y: 40,
+			w: null,
+			h: null,
+			r: 0,
 			text: "Test Idea",
 			imageId: null,
 			imageSrc: null,
@@ -95,12 +139,6 @@ describe("Idea Unit Tests", () => {
 
 		// Remove the previous callback
 		ideaProps.updateIdea.mockClear();
-
-		// X value changed
-		fireEvent.change(posXInput, { target: { value: "50", }, });
-
-		// Y value changed
-		fireEvent.change(posYInput, { target: { value: "60", }, });
 
 		// Text value changed
 		fireEvent.change(textInput, {
@@ -112,13 +150,17 @@ describe("Idea Unit Tests", () => {
 		// Click submit
 		fireEvent.click(screen.getByRole("button", { name: "Submit" }));
 
-		// updateIdea callback called with the proper updated values
+		// updateIdea callback called with the updated text; position
+		// is unchanged since moving is done by dragging, not the form.
 		expect(ideaProps.updateIdea).toHaveBeenCalledTimes(1);
 		expect(ideaProps.updateIdea).toHaveBeenCalledWith({
 			id: 1,
 			type: "text",
-			x: 50,
-			y: 60,
+			x: 25,
+			y: 40,
+			w: null,
+			h: null,
+			r: 0,
 			text: "Updated Test Idea",
 			imageId: null,
 			imageSrc: null,
@@ -126,7 +168,7 @@ describe("Idea Unit Tests", () => {
 		});
 
 		// Open the Idea and delete the Idea with the button
-		fireEvent.click(screen.getByText("Test Idea"));
+		pointerClick(screen.getByText("Test Idea"));
 		fireEvent.click(screen.getByRole("button", { name: "Delete Idea" }));
 
 		// Ensure deleteIdea is called with the correct idea id.
@@ -134,7 +176,7 @@ describe("Idea Unit Tests", () => {
 		expect(ideaProps.deleteIdea).toHaveBeenCalledWith(1);
 	});
 
-	// Text Idea callbacks work properly
+	// Image Idea callbacks work properly
 	it("Image Idea Callback Arguments are Called Only On Correct Button Presses", () => {
 		// Idea is an image
 		ideaProps = {
@@ -154,7 +196,7 @@ describe("Idea Unit Tests", () => {
 		render(<Idea {...ideaProps} />);
 
 		// Open Idea editing menu and click the Select Image button
-		fireEvent.click(screen.getByRole("img", { name: "User idea" }));
+		pointerClick(screen.getByRole("img", { name: "User idea" }));
 		fireEvent.click(screen.getByRole("button", { name: "Select Image" }));
 
 		// Ensure the image picker callback happened and the new image was added in the updateIdea callback.
@@ -164,6 +206,9 @@ describe("Idea Unit Tests", () => {
 			type: "image",
 			x: 25,
 			y: 40,
+			w: null,
+			h: null,
+			r: 0,
 			text: "Test Idea",
 			imageId: 20,
 			imageSrc: "/new-image.png",
@@ -180,6 +225,9 @@ describe("Idea Unit Tests", () => {
 			type: "image",
 			x: 25,
 			y: 40,
+			w: null,
+			h: null,
+			r: 0,
 			text: "Test Idea",
 			imageId: 10,
 			imageSrc: "/old-image.png",
@@ -197,6 +245,9 @@ describe("Idea Unit Tests", () => {
 			type: "image",
 			x: 25,
 			y: 40,
+			w: null,
+			h: null,
+			r: 0,
 			text: "Test Idea",
 			imageId: 10,
 			imageSrc: "/old-image.png",
@@ -204,7 +255,7 @@ describe("Idea Unit Tests", () => {
 		});
 
 		// Open the Idea and delete the Idea with the button
-		fireEvent.click(screen.getByRole("img", { name: "User idea" }));
+		pointerClick(screen.getByRole("img", { name: "User idea" }));
 		fireEvent.click(screen.getByRole("button", { name: "Delete Idea" }));
 
 		// Ensure deleteIdea is called with the correct idea id.
@@ -216,7 +267,7 @@ describe("Idea Unit Tests", () => {
 	it("X and Y values properly move the Idea", () => {
 		const { rerender } = render(<Idea {...ideaProps} />);
 
-		const idea = screen.getByText("Test Idea");
+		const idea = getIdeaBox(screen.getByText("Test Idea"));
 
 		// Idea begins at the right position
 		expect(idea).toHaveStyle("left: 25%");
@@ -232,8 +283,38 @@ describe("Idea Unit Tests", () => {
 		);
 
 		// Idea is at a new position
-		expect(screen.getByText("Test Idea")).toHaveStyle("left: 70%");
-		expect(screen.getByText("Test Idea")).toHaveStyle("top: 15%");
+		expect(getIdeaBox(screen.getByText("Test Idea"))).toHaveStyle("left: 70%");
+		expect(getIdeaBox(screen.getByText("Test Idea"))).toHaveStyle("top: 15%");
+	});
+
+	// Dragging an Idea commits the new position through updateIdea
+	it("Dragging the Idea calls updateIdea with the new position", () => {
+		render(<Idea {...ideaProps} />);
+
+		const idea = getIdeaBox(screen.getByText("Test Idea"));
+
+		// Drag 100px right and 50px down in a 1000x500 room:
+		// +10% on both axes.
+		fireEvent.pointerDown(idea, { button: 0, pointerId: 1, clientX: 0, clientY: 0 });
+		fireEvent.pointerMove(idea, { pointerId: 1, clientX: 100, clientY: 50 });
+		fireEvent.pointerUp(idea, { button: 0, pointerId: 1, clientX: 100, clientY: 50 });
+
+		expect(ideaProps.updateIdea).toHaveBeenCalledWith({
+			id: 1,
+			type: "text",
+			x: 35,
+			y: 50,
+			w: null,
+			h: null,
+			r: 0,
+			text: "Test Idea",
+			imageId: null,
+			imageSrc: null,
+			highlighted: false,
+		});
+
+		// A drag is not a click: the editor did not open.
+		expect(screen.queryByRole("button", { name: "Submit" })).not.toBeInTheDocument();
 	});
 
 	// Ensure highlighting works with manual highlighting and path targeting
@@ -241,7 +322,7 @@ describe("Idea Unit Tests", () => {
 		const { rerender } = render(<Idea {...ideaProps} />);
 
 		// Idea is not highlighted
-		expect(screen.getByText("Test Idea")).not.toHaveStyle("border: 2px solid #ffd700");
+		expect(getIdeaBox(screen.getByText("Test Idea"))).not.toHaveStyle("border: 2px solid #ffd700");
 
 		// Manually highlight Idea
 		rerender(
@@ -252,7 +333,7 @@ describe("Idea Unit Tests", () => {
 		);
 
 		// Idea is highlighted
-		expect(screen.getByText("Test Idea")).toHaveStyle("border: 2px solid #ffd700");
+		expect(getIdeaBox(screen.getByText("Test Idea"))).toHaveStyle("border: 2px solid #ffd700");
 
 		// Path highlights Idea
 		rerender(
@@ -264,6 +345,6 @@ describe("Idea Unit Tests", () => {
 		);
 
 		// Idea is highlighted
-		expect(screen.getByText("Test Idea")).toHaveStyle("border: 2px solid #ffd700");
+		expect(getIdeaBox(screen.getByText("Test Idea"))).toHaveStyle("border: 2px solid #ffd700");
 	});
 });
