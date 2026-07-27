@@ -111,7 +111,7 @@ export default function LoadRoomScreen({ isOpen, onClose, onCloseLoad }) {
     <div>
       <input
         ref={searchInputRef}
-        className="search-input"
+        className="search-input glass-glow glass-surface"
         type="text"
         placeholder="Search rooms..."
         defaultValue=""
