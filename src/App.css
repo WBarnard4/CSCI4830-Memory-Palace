@@ -47,9 +47,12 @@
 }
 
 .room-button {
-  padding: 2rem;
+  padding: 8px;
   font-size: 1rem;
+  font: inherit;
   cursor: pointer;
+
+  color: var(--glass-text);
 
   height: 140px;
   border: 3px solid white;
@@ -58,7 +61,6 @@
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
-
 }
 
 .bedroom-button {
@@ -89,7 +91,6 @@
   justify-content: center;
   gap: 0.75rem;
 
-  background-color: rgb(70, 70, 70);
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
@@ -97,9 +98,8 @@
 
 .room-creator .room-button {
   height: auto;
-  padding: 0.75rem;
-  background: rgba(255, 255, 255, 0.9);
-  color: black;
+  padding: 0.50rem;
+  --glass-outline-width: 100px;
 }
 
 .room-creator .menu-name-input {

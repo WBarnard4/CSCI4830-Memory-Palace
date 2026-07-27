@@ -80,18 +80,24 @@ export default function LoadRoomScreen({ isOpen, onClose, onCloseLoad }) {
           }
         }}
       />
-      <button className="search-clear-button" onClick={clearSearch}>
+      <button
+        className="search-clear-button glass-surface glass-glow glass-button glass-ripple"
+        onClick={clearSearch}
+      >
         Clear Search
       </button>
 
-      <button className="room-button" onClick={onClose}>
+      <button
+        className="room-button glass-surface glass-glow glass-button"
+        onClick={onClose}
+      >
         Home
       </button>
 
       {viewableRooms.map((room) => (
         <button
           key={room.id}
-          className="room-button"
+          className="room-button glass-surface glass-button"
           onClick={() => exportRoomData(room.id)}
           style={{
             backgroundImage: !room.imgSrc || room.imgSrc === "none" ? "none" : `url("${room.imgSrc}")`,

@@ -57,13 +57,16 @@ export default function NewRoomScreen({ isOpen, onClose, onGoHome, openImagePick
 
     return (
         <div>
-            <button className="room-button" onClick={onGoHome}>
+            <button
+                className="room-button glass-surface glass-glow glass-button"
+                onClick={onGoHome}
+            >
                 Home
             </button>
             <div className="room-grid">
                 {/* set activeRoom to Bedroom, rendering it in App.jsx */}
                 <button
-                    className="room-button bedroom-button"
+                    className="room-button glass-surface glass-ripple glass-button bedroom-button"
                     onClick={() => setupRoomCreation("Bedroom", bedroomUrl)}
                 >
                     Bedroom
@@ -71,7 +74,7 @@ export default function NewRoomScreen({ isOpen, onClose, onGoHome, openImagePick
 
                 {/* set activeRoom to Living Room, rendering it in App.jsx */}
                 <button
-                    className="room-button living-room-button"
+                    className="room-button glass-surface glass-ripple glass-button living-room-button"
                     onClick={() => setupRoomCreation("Living Room", livingRoomUrl)}
                 >
                     Living Room
@@ -79,7 +82,7 @@ export default function NewRoomScreen({ isOpen, onClose, onGoHome, openImagePick
 
                 {/* set activeRoom to Kitchen, rendering it in App.jsx */}
                 <button
-                    className="room-button kitchen-button"
+                    className="room-button glass-surface glass-ripple glass-button kitchen-button"
                     onClick={() => setupRoomCreation("Kitchen", kitchenUrl)}
                 >
                     Kitchen
@@ -87,35 +90,40 @@ export default function NewRoomScreen({ isOpen, onClose, onGoHome, openImagePick
 
                 {/* set activeRoom to Bathroom, rendering it in App.jsx */}
                 <button
-                    className="room-button bathroom-button"
+                    className="room-button glass-surface glass-ripple glass-button bathroom-button"
                     onClick={() => setupRoomCreation("Bathroom", bathroomUrl)}
                 >
                     Bathroom
                 </button>
 
                 <div
-                    className="room-creator"
+                    className="room-creator glass-surface"
                     style={{
                         backgroundImage: roomCreation.imgSrc
                             ? `linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url("${roomCreation.imgSrc}")`
                             : "none",
                     }}
                 >
-                    <input
-                        key={roomCreation.name}
-                        className="menu-name-input"
-                        type="text"
-                        defaultValue={roomCreation.name}
-                        onKeyDown={newNameEntered}
-                    />
+                    <div
+                        className="glass-surface glass-glow glass-ripple"
+                    >
+                        <textarea
+                            className="glass-textarea"
+                            defaultValue={roomCreation.name}
+                            rows="2"
+                            wrap="soft"
+                            onKeyDown={newNameEntered}
+                            onBlur={newNameEntered}
+                        />
+                    </div>
                     <button
-                        className="room-button"
+                        className="room-button glass-surface glass-glow glass-ripple glass-button"
                         onClick={pickBackground}
                     >
                         Choose Background
                     </button>
                     <button
-                        className="room-button"
+                        className="room-button glass-surface glass-glow glass-button"
                         onClick={createRoom}
                     >
                         Create Room
