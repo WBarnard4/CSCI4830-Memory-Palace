@@ -123,7 +123,7 @@ export default function LoadRoomScreen({ isOpen, onClose, onCloseLoad }) {
         }}
       />
       <button
-        className="back-button glass-surface glass-glow glass-ripple glass-button"
+        className="back-button glass-surface glass-glow glass-button"
         onClick={onClose}
         aria-label="Back to home"
       >
