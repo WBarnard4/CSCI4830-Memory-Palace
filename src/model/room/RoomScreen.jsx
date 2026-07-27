@@ -401,14 +401,13 @@ export default function RoomScreen({ roomData, updateRoomData, openImagePicker, 
       </div>
 
       {/* prev/next widget, bottom center so it doesn't fight with the two corner menus */}
-      {pathActive && (
-        <PathNav
-          pathIndex={pathIndex}
-          total={ideas.length}
-          onPrev={prevPathStep}
-          onNext={nextPathStep}
-        />
-      )}
+      <PathNav
+        active={pathActive}
+        pathIndex={pathIndex}
+        total={ideas.length}
+        onPrev={prevPathStep}
+        onNext={nextPathStep}
+      />
     </div>
   );
 }

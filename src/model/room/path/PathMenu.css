@@ -1,120 +1,307 @@
 .path-menu {
-  position: fixed;
-  top: 16px;
-  right: 16px;
-  z-index: 1000;
-  font-family: inherit;
+	position: fixed;
+	top: 16px;
+	right: 16px;
+	left: auto;
+	z-index: 1000;
+
+	font-family: inherit;
+
+	/* Size of the closed path-menu button */
+	--menu-button-size: 54px;
+
+	/* Reusable control configuration */
+	--glass-control-min-height: 39px;
+	--glass-control-padding: 8px 10px;
+	--glass-control-radius: 11px;
+	--glass-control-gap: 9px;
+
+	/* Bottom close-zone configuration */
+	--glass-close-zone-height: 34px;
+	--glass-close-zone-margin: 0 -12px -12px;
+	--glass-close-zone-padding: 4px 12px 8px;
+	--glass-close-zone-radius: 30px;
+
+	/* Path icon appearance */
+	--path-menu-icon-color: rgba(252, 254, 255, 0.88);
 }
 
-.path-menu-closed {
-  width: 50px;
-  height: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #6b7280;
-  border: 1px solid #8b929e;
-  border-radius: 50%;
-  cursor: pointer;
-  box-sizing: border-box;
+/* ------------------------------------------------------------ */
+/* Open menu panel                                               */
+/* ------------------------------------------------------------ */
+
+.path-menu .menu-panel {
+	/*
+	 * These override MenuAnimations.css for only PathMenu.
+	 */
+	--menu-open-width: 150px;
+	--menu-closed-size: var(--menu-button-size);
+	--menu-collapse-width: 3px;
+
+	--menu-closed-radius: 999px;
+	--menu-line-radius: 3px;
+	--menu-open-radius: 30px;
+
+	--menu-open-duration: 400ms;
+	--menu-close-duration: 550ms;
+
+	--menu-content-open-delay: 300ms;
+	--menu-content-open-duration: 700ms;
+	--menu-content-close-duration: 100ms;
+
+	/* Entire panel opacity */
+	--glass-surface-opacity: 0.16;
+
+	padding: 12px;
+
+	overflow: visible;
+	isolation: isolate;
+	box-sizing: border-box;
+
+	border-radius: var(--menu-open-radius);
 }
 
-.path-menu-closed::before {
-  content: "";
-  width: 18px;
-  height: 18px;
-  border: 3px solid white;
-  border-radius: 50%;
-  box-sizing: border-box;
+/* Contents inside the animated outer panel */
+.path-menu .menu-opened {
+	display: flex;
+	flex-direction: column;
+	gap: var(--glass-control-gap);
 }
 
-.path-menu > div:not(.path-menu-closed) {
-  width: 180px;
-  padding: 8px;
-  box-sizing: border-box;
-  background: #eeeeee;
-  border: 1px solid #777777;
-  border-radius: 5px;
-  color: black;
-  text-align: left;
+/* ------------------------------------------------------------ */
+/* Closed path-menu button                                       */
+/* ------------------------------------------------------------ */
+
+.path-menu button.menu-closed {
+	--glass-surface-opacity: 0.08;
+	--glass-hover-opacity: 0.15;
+
+	position: relative;
+
+	width: var(--menu-button-size);
+	height: var(--menu-button-size);
+	padding: 0;
+
+	border-radius: 50%;
+	cursor: pointer;
 }
 
-.path-menu h1 {
-  margin: 0 0 7px;
-  padding: 0;
-  font-size: 13px;
-  line-height: 1.2;
-  color: black;
+/*
+ * Circular path icon shown inside the closed button.
+ *
+ * This overrides Menu.css's hamburger ::before rule because it is
+ * scoped under .path-menu.
+ */
+.path-menu .menu-closed::before {
+	content: "";
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	z-index: 3;
+
+	width: 21px;
+	height: 21px;
+
+	box-sizing: border-box;
+
+	background: transparent;
+	border: 3px solid var(--path-menu-icon-color);
+	border-radius: 50%;
+
+	transform: translate(-50%, -50%);
+
+	box-shadow:
+		inset 0 0 4px rgba(255, 255, 255, 0.32),
+		0 0 4px rgba(255, 255, 255, 0.6);
+
+	filter:
+		blur(0.3px)
+		drop-shadow(0 0 3px rgba(255, 255, 255, 0.65));
+
+	opacity: 0.92;
 }
+
+.path-menu .menu-closed:hover {
+	transform: scale(1.05);
+}
+
+.path-menu .menu-closed:active {
+	transform: scale(0.84);
+}
+
+/*
+ * Temporary icon displayed during the shared open/close animation.
+ * MenuAnimations.css controls its position and horizontal collapse.
+ */
+.path-menu-transition-icon {
+	width: 21px;
+	height: 21px;
+
+	box-sizing: border-box;
+
+	background: transparent;
+	border: 3px solid var(--path-menu-icon-color);
+	border-radius: 50%;
+
+	box-shadow:
+		inset 0 0 4px rgba(255, 255, 255, 0.32),
+		0 0 4px rgba(255, 255, 255, 0.6);
+
+	filter:
+		blur(0.3px)
+		drop-shadow(0 0 3px rgba(255, 255, 255, 0.65));
+}
+
+/* ------------------------------------------------------------ */
+/* Path-menu heading                                             */
+/* ------------------------------------------------------------ */
+
+.path-menu-title {
+	margin: 2px 0 0;
+
+	font-size: 17px;
+	font-weight: 650;
+	line-height: 1.2;
+	text-align: center;
+
+	color: var(--glass-text);
+}
+
+/* ------------------------------------------------------------ */
+/* Path list                                                     */
+/* ------------------------------------------------------------ */
 
 .path-list {
-  list-style: none;
-  margin: 0 0 8px;
-  padding: 0;
-  max-height: 160px;
-  overflow-y: auto;
-  font-size: 13px;
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+
+	max-height: 190px;
+	margin: 0;
+	padding: 2px;
+
+	overflow-x: hidden;
+	overflow-y: auto;
+
+	list-style: none;
+
+	font-size: 13px;
 }
 
-.path-list li {
-  padding: 3px 4px;
-  border-radius: 3px;
+.path-list-item {
+	--glass-surface-opacity: 0.025;
+
+	padding: 7px 9px;
+
+	box-sizing: border-box;
+	border-radius: 10px;
+
+	line-height: 1.25;
+
+	transition:
+		background 180ms ease,
+		border-color 180ms ease,
+		box-shadow 180ms ease,
+		transform 180ms ease;
 }
 
-.path-current {
-  background: #ffd700;
-  font-weight: bold;
+.path-idea-number {
+	font-weight: 650;
 }
 
+/* Currently highlighted idea in the active path */
+.path-list-item.path-current {
+	--glass-surface-opacity: 0.16;
+
+	border-color: var(--glass-border-hover);
+
+	box-shadow:
+		inset 0 1px 1px rgba(255, 255, 255, 0.42),
+		0 0 14px
+			rgb(
+				var(--glass-glow-color) /
+					0.22
+			);
+
+	transform: translateX(-2px);
+
+	font-weight: 650;
+}
+
+/* Empty list message */
 .path-empty {
-  font-size: 13px;
-  margin: 0 0 8px;
+	margin: 4px 0 8px;
+
+	font-size: 13px;
+	text-align: center;
+
+	opacity: 0.75;
 }
 
+/* ------------------------------------------------------------ */
+/* Path controls                                                 */
+/* ------------------------------------------------------------ */
+
+.path-menu .menu-action {
+	--glass-surface-opacity: 0.035;
+	--glass-hover-opacity: 0.1;
+
+	width: 100%;
+}
+
+/* Container used while a path is active */
+.path-active-controls {
+	display: flex;
+	flex-direction: column;
+	gap: var(--glass-control-gap);
+}
+
+/* Current path position */
 .path-position {
-  margin: 0 0 6px;
-  font-size: 13px;
-  text-align: center;
+	margin: 0;
+	padding: 2px 0;
+
+	font-size: 14px;
+	font-weight: 650;
+	text-align: center;
+
+	color: var(--glass-text);
 }
 
-.path-controls {
-  display: flex;
-  gap: 6px;
-  margin-bottom: 6px;
+/* Previous and Next row */
+.path-menu .menu-room-actions {
+	display: flex;
+	gap: var(--glass-control-gap);
 }
 
-.path-menu button {
-  width: 100%;
-  padding: 6px;
-  font: inherit;
-  font-size: 14px;
-  color: black;
-  background: white;
-  border: 1px solid #888888;
-  border-radius: 3px;
-  cursor: pointer;
-  margin-top: 4px;
+.path-menu .menu-room-actions > .menu-action {
+	flex: 1;
+	min-width: 0;
 }
 
-.path-menu button:hover {
-  background: #dddddd;
+/* Disabled Start button */
+.path-menu .menu-action:disabled {
+	opacity: 0.45;
+	cursor: default;
 }
 
-.path-controls button {
-  flex: 1;
-  margin-top: 0;
-  background: #dddddd;
-  color: black;
-  border: 1px solid #888888;
+.path-menu .menu-action:disabled:hover,
+.path-menu .menu-action:disabled:active {
+	transform: none;
 }
 
-.path-controls button:hover,
-.path-controls button:active,
-.path-controls button:focus {
-  background: #dddddd;
-}
+/* ------------------------------------------------------------ */
+/* Close area                                                    */
+/* ------------------------------------------------------------ */
 
-.path-menu button:disabled {
-  opacity: 0.5;
-  cursor: default;
+/*
+ * GlassComponents.css supplies most of the close-zone appearance.
+ * This only ensures it uses the panel's rounded bottom corners.
+ */
+.path-menu .menu-close-zone {
+	border-radius:
+		0
+		0
+		var(--menu-open-radius)
+		var(--menu-open-radius);
 }
