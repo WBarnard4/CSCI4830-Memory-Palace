@@ -1,16 +1,30 @@
 html, body {
-  height: 100%;
-  background-color: rgb(30, 25, 125);
   margin: 0;
   padding: 0;
+}
+
+body {
+  height: 100%;
+  width: 100%;
+
+  /* Brick texture math */
+  --s: 44px; /* control the size*/
+  --c1: #332009;
+  --c2: #353535;
+  
+  --g:conic-gradient(at 90% 40%,#0000 75%,var(--c1) 0);
+  background: var(--g),var(--g) var(--s) var(--s) var(--c2);
+  background-size: calc(2*var(--s)) calc(2*var(--s));
+}
+
+* {
+  box-sizing: border-box;
 }
 
 .home {
   text-align: center;
   padding: 2rem;
-  background-color: rgb(30, 25, 125);
   height: 100%;
-  
 }
 
 .room-viewport {
