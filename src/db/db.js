@@ -84,6 +84,7 @@ export async function saveRoom(roomData, ideas) {
         w: idea.w ?? null,
         h: idea.h ?? null,
         r: idea.r ?? null,
+        title: idea.title ?? null,
         text: idea.text ?? null,
         imageId: idea.imageId ?? null,
       });

@@ -77,6 +77,7 @@ export default function RoomScreen({ roomData, updateRoomData, openImagePicker, 
         type: "image",
         x: currentPopupPosition.x,
         y: currentPopupPosition.y,
+        title: "New Image Idea",
         imageId: imageId,
         imageSrc: imageSrc,
         highlighted: false,
@@ -179,7 +180,8 @@ export default function RoomScreen({ roomData, updateRoomData, openImagePicker, 
       type: "text",
       x: popupPosition.x,
       y: popupPosition.y,
-      text: "New Idea",
+      title: "New Text Idea",
+      text: "",
       highlighted: false,
     };
 
@@ -352,6 +354,7 @@ export default function RoomScreen({ roomData, updateRoomData, openImagePicker, 
                 w={idea.w}
                 h={idea.h}
                 r={idea.r}
+                title={idea.title}
                 text={idea.text}
                 imageId={idea.imageId}
                 imageSrc={idea.imageSrc}

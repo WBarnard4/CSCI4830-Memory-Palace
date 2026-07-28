@@ -1,7 +1,7 @@
 import { useState, useRef, useLayoutEffect } from "react";
 
-export function Idea({ id, type, x, y, w, h, r, text, roomBaseDimensions, imageId, imageSrc, highlighted, pathHighlighted, zIndex, updateIdea, deleteIdea, openImagePicker, moveIdeaBack, moveIdeaForward, isFirst, isLast, roomRef }) {
-  const [active, setActive] = useState(false);
+export function Idea({ id, type, x, y, w, h, r, title, text, roomBaseDimensions, imageId, imageSrc, highlighted, pathHighlighted, zIndex, updateIdea, deleteIdea, openImagePicker, moveIdeaBack, moveIdeaForward, isFirst, isLast, roomRef }) {
+  const [menuActive, toggleMenu] = useState(false);
 
   // Live position/width while a drag or resize gesture is in
   // progress. Committed to RoomScreen state only on release so
@@ -27,6 +27,7 @@ export function Idea({ id, type, x, y, w, h, r, text, roomBaseDimensions, imageI
     w: w ?? null,
     h: h ?? null,
     r: r ?? 0,
+    title: title,
     text: text,
     imageId: imageId,
     imageSrc: imageSrc,
@@ -73,7 +74,7 @@ export function Idea({ id, type, x, y, w, h, r, text, roomBaseDimensions, imageI
     if (document.fonts && document.fonts.ready) {
       document.fonts.ready.then(measure);
     }
-  }, [ideaInfo.type, ideaInfo.text]);
+  }, [ideaInfo.type, ideaInfo.title]);
 
   // Paint-style stretch: scale the text block to exactly fill the
   // box's content area, in room-base pixels. 24px accounts for
@@ -250,7 +251,7 @@ export function Idea({ id, type, x, y, w, h, r, text, roomBaseDimensions, imageI
 
       let angle =
         (Math.atan2(event.clientY - centerY, event.clientX - centerX) * 180) /
-          Math.PI +
+        Math.PI +
         90;
 
       // Snap to right angles when close, so straightening an
@@ -286,7 +287,7 @@ export function Idea({ id, type, x, y, w, h, r, text, roomBaseDimensions, imageI
     if (!gesture.moved) {
       // Pointer never really moved: this was a plain click.
       if (gesture.kind === "move") {
-        setActive(!active);
+        toggleMenu(!menuActive);
       }
     } else if (gesture.kind === "move") {
       updateIdea({ ...ideaInfo, x: gesture.lastX, y: gesture.lastY });
@@ -315,14 +316,18 @@ export function Idea({ id, type, x, y, w, h, r, text, roomBaseDimensions, imageI
     // Position and size are handled by dragging now, so the
     // editor only needs to commit text changes.
     const formData = new FormData(e.target);
-    let newText = formData.get("text");
+    let newTitle = formData.get("title");
+    let newText = formData.get("text")
 
+    if (!newTitle) {
+      newTitle = ideaInfo.title;
+    }
     if (!newText) {
       newText = ideaInfo.text;
     }
 
-    setActive(false);
-    updateIdea({ ...ideaInfo, text: newText });
+    toggleMenu(false);
+    updateIdea({ ...ideaInfo, title: newTitle, text: newText });
   }
 
   function handleDelete() {
@@ -415,7 +420,7 @@ export function Idea({ id, type, x, y, w, h, r, text, roomBaseDimensions, imageI
                   transformOrigin: "top left",
                 }}
               >
-                {ideaInfo.text}
+                {ideaInfo.title}
               </span>
             </div>
           ) : (
@@ -423,7 +428,7 @@ export function Idea({ id, type, x, y, w, h, r, text, roomBaseDimensions, imageI
               ref={textRef}
               style={{ display: "inline-block", whiteSpace: "pre" }}
             >
-              {ideaInfo.text}
+              {ideaInfo.title}
             </span>
           ))}
 
@@ -435,22 +440,22 @@ export function Idea({ id, type, x, y, w, h, r, text, roomBaseDimensions, imageI
             style={
               shownW != null
                 ? {
-                    // Resized: take the exact shape of the box,
-                    // stretching rather than proportionally scaling
-                    width: "100%",
-                    height: shownH != null ? "100%" : "auto",
-                    display: "block",
-                    objectFit: "fill",
-                    pointerEvents: "none",
-                  }
+                  // Resized: take the exact shape of the box,
+                  // stretching rather than proportionally scaling
+                  width: "100%",
+                  height: shownH != null ? "100%" : "auto",
+                  display: "block",
+                  objectFit: "fill",
+                  pointerEvents: "none",
+                }
                 : {
-                    // Never resized: original fixed thumbnail size
-                    width: "100px",
-                    height: "100px",
-                    display: "block",
-                    objectFit: "contain",
-                    pointerEvents: "none",
-                  }
+                  // Never resized: original fixed thumbnail size
+                  width: "100px",
+                  height: "100px",
+                  display: "block",
+                  objectFit: "contain",
+                  pointerEvents: "none",
+                }
             }
           />
         )}
@@ -500,8 +505,8 @@ export function Idea({ id, type, x, y, w, h, r, text, roomBaseDimensions, imageI
           }}
         />
       </div>
-      {active && (
-        <div
+      {menuActive && (
+        <div className="idea-menu"
           style={{
             position: "absolute",
             left: `${editorX}%`,
@@ -516,7 +521,33 @@ export function Idea({ id, type, x, y, w, h, r, text, roomBaseDimensions, imageI
             // Above every idea (highlighted ideas reach 1000+n)
             zIndex: 3000,
           }}>
+
           <form onSubmit={setInfo}>
+            <div>
+              <label>Title</label>
+              <br />
+              <textarea
+                defaultValue={ideaInfo.title}
+                name="title"
+                rows="1"
+                style={{
+                  width: "100%",
+                  resize: "none"
+                }}
+              />
+              <br />
+
+              <label>Description</label>
+              <br />
+              <textarea
+                defaultValue={ideaInfo.text}
+                name="text"
+                style={{
+                  width: "100%",
+                }}
+              />
+            </div>
+
             {ideaInfo.type === "image" ? (
               <>
                 <button type="button" onClick={chooseNewImage}>Select Image</button>
@@ -524,14 +555,8 @@ export function Idea({ id, type, x, y, w, h, r, text, roomBaseDimensions, imageI
               </>
             ) : (
               <>
-                <label name="text">Change Text</label>
-                <br />
-                <textarea name="text" defaultValue={ideaInfo.text}></textarea>
-                <br />
-
               </>
             )}
-
 
             <button type="button" onClick={toggleHighlight}>
               {ideaInfo.highlighted ? "Remove Highlight" : "Highlight"}

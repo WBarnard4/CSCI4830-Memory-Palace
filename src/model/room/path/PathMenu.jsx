@@ -29,10 +29,7 @@ export function PathMenu({ ideas, pathActive, pathIndex, onStart, onNext, onPrev
   }, [opened, closing]);
 
   function label(idea) {
-    if (idea.type === "text") {
-      return idea.text ? idea.text.slice(0, 20) : "Untitled";
-    }
-    return "Image";
+    return idea.title ? idea.title.slice(0, 20) : "Untitled";
   }
 
   function startPath() {
