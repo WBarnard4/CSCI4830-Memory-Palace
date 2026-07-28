@@ -1,7 +1,39 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  height: 100%;
+  width: 100%;
+
+  /* Brick texture math */
+  --s: 44px; /* control the size*/
+  --c1: #332009;  /* Brick color*/
+  --c2: #353535;  /* Mortar color*/
+
+  --g: conic-gradient(at 90% 40%, #0000 75%, var(--c1) 0);
+  background: var(--g), var(--g) var(--s) var(--s) var(--c2);
+  background-size: calc(2*var(--s)) calc(2*var(--s));
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.home-title {
+  color: #ffffff;
+}
+
+.home-subtitle {
+  color: #dcdcdc;
+}
+
 .home {
   text-align: center;
-  padding:12rem;
-  background-color: rgb(30, 25, 125);
+  padding: 2rem;
+  height: 100%;
 }
 
 .room-viewport {
@@ -100,7 +132,7 @@
 .search-input {
   display: block;
   width: min(340px, 90vw);
-  margin: 0 auto 0.75rem;
+  margin: 2rem auto 0.75rem;
   padding: 0.65rem 1rem;
   box-sizing: border-box;
 

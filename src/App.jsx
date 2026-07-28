@@ -125,8 +125,8 @@ function App() {
   } else {
     appScreen = (
       <div className="home">
-        <h1>Memory Palace</h1>
-        <p>Pick a Background Room</p>
+        <h1 className="home-title">Memory Palace</h1>
+        <p className="home-subtitle">Pick a Background Room</p>
 
         {/* Landing page, buttons to enable NewRoomScreen or LoadRoomScreen components */}
         <HomeScreen
