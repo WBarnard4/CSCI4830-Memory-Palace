@@ -11,7 +11,7 @@ export default function HomeScreen({isOpen, openLoad, openNew}) {
 
                 {/* Enable LoadRoomScreen component */}
                 <button
-                    className="room-button"
+                    className="room-button glass-surface glass-glow glass-button"
                     onClick={openLoad}
                 >
                     Load Room
@@ -19,7 +19,7 @@ export default function HomeScreen({isOpen, openLoad, openNew}) {
 
                 {/* Enable NewRoomScreen component */}
                 <button
-                    className="room-button"
+                    className="room-button glass-surface glass-glow glass-button"
                     onClick={openNew}
                 >
                     New Room

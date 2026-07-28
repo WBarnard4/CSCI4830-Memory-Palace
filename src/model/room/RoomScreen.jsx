@@ -59,7 +59,7 @@ export default function RoomScreen({ roomData, updateRoomData, openImagePicker, 
     openImagePicker(({ imageId, imageSrc }) => {
       updateRoomData({
         imgSrc: imageSrc,
-        backgroundImageId: imageId,
+        imageId: imageId,
       });
     });
   }
@@ -349,6 +349,9 @@ export default function RoomScreen({ roomData, updateRoomData, openImagePicker, 
                 type={idea.type}
                 x={idea.x}
                 y={idea.y}
+                w={idea.w}
+                h={idea.h}
+                r={idea.r}
                 text={idea.text}
                 imageId={idea.imageId}
                 imageSrc={idea.imageSrc}
@@ -362,6 +365,8 @@ export default function RoomScreen({ roomData, updateRoomData, openImagePicker, 
                 isFirst={index === 0}
                 isLast={index === ideas.length - 1}
                 openImagePicker={openImagePicker}
+                roomRef={roomRef}
+                roomBaseDimensions={baseRoomDimensions}
                 key={idea.id}>
               </Idea>
             );
@@ -401,14 +406,13 @@ export default function RoomScreen({ roomData, updateRoomData, openImagePicker, 
       </div>
 
       {/* prev/next widget, bottom center so it doesn't fight with the two corner menus */}
-      {pathActive && (
-        <PathNav
-          pathIndex={pathIndex}
-          total={ideas.length}
-          onPrev={prevPathStep}
-          onNext={nextPathStep}
-        />
-      )}
+      <PathNav
+        active={pathActive}
+        pathIndex={pathIndex}
+        total={ideas.length}
+        onPrev={prevPathStep}
+        onNext={nextPathStep}
+      />
     </div>
   );
 }

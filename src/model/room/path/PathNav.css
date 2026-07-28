@@ -1,39 +1,118 @@
+/**
+  * Make the text readable on all backgrounds
+  */
 .path-nav {
-  position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: #eeeeee;
-  border: 1px solid #777777;
-  border-radius: 24px;
-  padding: 8px 16px;
-  box-shadow: rgba(0, 0, 0, 0.1) 0 10px 15px -3px;
+	--glass-surface-opacity: 0.25;
 }
 
-.path-nav button {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: 1px solid #888888;
-  background: #dddddd;
-  color: black;
-  font-size: 16px;
-  cursor: pointer;
+/*
+ * Bottom-center path navigation.
+ *
+ * The increased specificity ensures these variables override the
+ * defaults from MenuAnimations.css.
+ */
+.path-nav.menu-transition-panel {
+	/* Shared menu-animation configuration */
+	--menu-open-width: 190px;
+	--menu-closed-size: 10px;
+	--menu-collapse-width: 3px;
+
+	--menu-closed-radius: 999px;
+	--menu-line-radius: 3px;
+	--menu-open-radius: 18px;
+
+	--menu-open-duration: 340ms;
+	--menu-close-duration: 320ms;
+
+	--menu-content-open-delay: 255ms;
+	--menu-content-open-duration: 80ms;
+	--menu-content-close-duration: 60ms;
+
+	/* Optional PathNav-specific glass settings */
+	/* --glass-glow-color: 210 235 255; */
+	/* --glass-glow-size: 16px; */
+	/* --glass-glow-strength: 0.2; */
+	/* --glass-glow-spread: 0px; */
+
+	position: fixed;
+	left: 50%;
+	bottom: 20px;
+	z-index: 1000;
+
+	padding: 8px;
+	box-sizing: border-box;
+
+	/*
+	 * MenuAnimations.css controls the width using
+	 * --menu-open-width.
+	 */
+	min-height: var(--menu-closed-size);
+
+	border-radius: var(--menu-open-radius);
+
+	/*
+	 * translateX centers the final panel.
+	 * The shared transition uses clip-path rather than transform,
+	 * so these do not conflict.
+	 */
+	transform: translateX(-50%);
+
+	/*
+	 * Allows shadows and glows to extend beyond the panel after
+	 * the opening animation finishes.
+	 */
+	overflow: visible;
+	isolation: isolate;
 }
 
-.path-nav button:hover,
-.path-nav button:active,
-.path-nav button:focus {
-  background: #dddddd;
+/* Internal horizontal layout */
+.path-nav-content {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+
+	width: 100%;
 }
 
+/* Previous and next buttons */
+.path-nav-button {
+	--glass-surface-background:
+		rgba(225, 235, 245, 0.035);
+
+	--glass-hover-background:
+		rgba(245, 250, 255, 0.12);
+
+	flex: 0 0 42px;
+
+	width: 42px;
+	height: 38px;
+	padding: 0;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	border-radius: 12px;
+
+	font: inherit;
+	font-size: 21px;
+	font-weight: 650;
+	line-height: 1;
+	color: var(--glass-text);
+}
+
+/* Current path position */
 .path-nav-label {
-  color: black;
-  font-size: 14px;
-  min-width: 48px;
-  text-align: center;
+	position: relative;
+	z-index: 3;
+
+	flex: 1;
+	min-width: 0;
+
+	font-size: 14px;
+	font-weight: 650;
+	text-align: center;
+	white-space: nowrap;
+
+	color: var(--glass-text);
 }

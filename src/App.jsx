@@ -13,7 +13,7 @@ import RoomScreen from "@/model/room/RoomScreen.jsx";
 
 import RoomFactory from "@/utils/RoomFactory.jsx";
 
-import { saveImage } from "@/db/db.js";
+import { saveImage, createRoom, updateRoomName } from "@/db/db.js";
 
 
 
@@ -58,16 +58,18 @@ function App() {
    * Sets state back to MAIN and renders a RoomScreen based on the name.
    * @param {string} roomData - Name of the Room, passed to setActiveRoom().
   */
-  function handleNewRoomClick(name, imgSrc) {
+  async function handleNewRoomClick(name, imageId, imgSrc) {
     setHomeState(HOME_STATES.MAIN);
-    setActiveRoom({ id: null, name, imgSrc: imgSrc, ideas: [], type: "New" });
-  }
 
-  // NOTE: Unsure what type is used for, but new room logic is adjusted to always have "New" information.
-  // function handleTemplateRoomClick(name, imgSrc) {
-  //   setHomeState(HOME_STATES.MAIN);
-  //   setActiveRoom({ id: null, name, imgSrc: imgSrc, ideas: [], type: "Template" });
-  // }
+    const id = await createRoom(name, imageId, imgSrc);
+
+    setActiveRoom({
+      id: id,
+      name,
+      imgSrc: imgSrc,
+      ideas: [],
+    });
+  }
 
   function handleLoadRoomClick(data) {
     setHomeState(HOME_STATES.MAIN);
@@ -88,7 +90,8 @@ function App() {
     setHomeState(screen);
   }
 
-  function updateActiveRoom(changes) {
+  async function updateActiveRoom(changes) {
+    const roomId = activeRoom.id;
     setActiveRoom((loadedRoom) => {
       if (loadedRoom === null) {
         return null;
@@ -96,8 +99,9 @@ function App() {
       return { ...loadedRoom, ...changes };
     })
 
-
-    // TODO: Update in DB
+    if (changes.name != undefined) {
+      await updateRoomName(roomId, changes.name)
+    }
   }
 
   let appScreen;

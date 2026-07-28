@@ -1,125 +1,224 @@
 .menu {
-  position: fixed;
-  top: 16px;
-  left: 16px;
-  z-index: 1000;
-  font-family: inherit;
+	position: fixed;
+	top: 16px;
+	left: 16px;
+	z-index: 1000;
+
+	font-family: inherit;
+
+	/* Size of this menu's closed button */
+	--menu-button-size: 54px;
+
+	/* Menu control configuration */
+	--glass-control-min-height: 39px;
+	--glass-control-padding: 8px 10px;
+	--glass-control-radius: 11px;
+	--glass-control-gap: 9px;
+
+	/* Room-name textarea configuration */
+	--glass-input-radius: 12px;
+	--glass-textarea-min-height: 54px;
+	--glass-textarea-max-height: 90px;
+
+	/* Popup configuration */
+	--glass-inline-popup-gap: 10px;
+	--glass-inline-popup-padding: 8px 12px;
+
+	/* Bottom close-zone configuration */
+	--glass-close-zone-height: 34px;
+	--glass-close-zone-margin: 0 -12px -12px;
+	--glass-close-zone-padding: 4px 12px 8px;
+	--glass-close-zone-radius: 20px;
+
+	/* Hamburger appearance */
+	--menu-glass-lines: rgba(252, 254, 255, 0.88);
+
+	/* Menu-specific glow settings */
+	/* --glass-glow-color: 210 235 255; */
+	/* --glass-glow-size: 18px; */
+	/* --glass-glow-strength: 0.22; */
+	/* --glass-glow-spread: 0px; */
 }
 
-/* Closed Menu */
-.menu-closed {
-  width: 50px;
-  height: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #6b7280;
-  border: 1px solid #8b929e;
-  border-radius: 50%;
-  cursor: pointer;
-  box-sizing: border-box;
-}
+.menu .menu-panel {
+	/*
+	 * These override the defaults declared by
+	 * .menu-transition-panel in MenuAnimations.css.
+	 */
+	--menu-open-width: 250px;
+	--menu-closed-size: var(--menu-button-size);
+	--menu-collapse-width: 3px;
 
-/* 3 Lines on Menu */
-.menu-closed::before {
-  content: "";
-  width: 24px;
-  height: 3px;
-  background: white;
-  border-radius: 2px;
-  box-shadow:
-    0 -8px 0 white,
-    0 8px 0 white;
-}
+	--menu-closed-radius: 999px;
+	--menu-line-radius: 3px;
+	--menu-open-radius: 30px;
 
-/* Outer Menu Rectangle */
-.menu > div:not(.menu-closed) {
-  width: 140px;
-  padding: 8px;
-  box-sizing: border-box;
-  background: #eeeeee;
-  border: 1px solid #777777;
-  border-radius: 5px;
-  color: black;
-}
+	--menu-open-duration: 400ms;
+	--menu-close-duration: 550ms;
 
-/* Menu Options are Tiled Vertically */
-.menu-opened,
-.menu-sure {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
+	--menu-content-open-delay: 300ms;
+	--menu-content-open-duration: 700ms;
+	--menu-content-close-duration: 100ms;
 
+	padding: 12px;
 
-.menu-name-input {
-	width: 100%;
+	overflow: visible;
+	isolation: isolate;
 	box-sizing: border-box;
-	margin: 0 0 7px;
-	padding: 5px;
-	font: inherit;
-	font-size: 13px;
-	color: black;
-	background: white;
-	border: 1px solid #888888;
-	border-radius: 3px;
+
+	border-radius: var(--menu-open-radius);
 }
 
-/* Menu Buttons */
-.menu button {
-  width: 100%;
-  padding: 6px;
-  font: inherit;
-  font-size: 14px;
-  color: black;
-  background: white;
-  border: 1px solid #888888;
-  border-radius: 3px;
-  cursor: pointer;
+/* ------------------------------------------------------------ */
+/* Closed menu                                                   */
+/* ------------------------------------------------------------ */
+.menu button.menu-closed {
+	--glass-surface-background: rgba(210, 220, 232, 0.08);
+	--glass-hover-background: rgba(235, 242, 250, 0.15);
+
+	position: relative;
+
+	width: var(--menu-button-size);
+	height: var(--menu-button-size);
+	padding: 0;
+
+	border-radius: 50%;
+	cursor: pointer;
 }
 
-.menu button:hover {
-  background: #dddddd;
+/* Hamburger lines on the closed button */
+.menu-closed::before {
+	content: "";
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	z-index: 3;
+
+	width: 24px;
+	height: 3px;
+
+	background: var(--menu-glass-lines);
+	border-radius: 999px;
+
+	transform: translate(-50%, -50%);
+
+	box-shadow:
+		0 -8px 0 var(--menu-glass-lines),
+		0 8px 0 var(--menu-glass-lines);
+
+	filter:
+		blur(0.45px)
+		drop-shadow(0 0 3px rgba(255, 255, 255, 0.7));
+
+	opacity: 0.92;
 }
 
-/* Confirmation text */
-.menu-sure h2 {
-  margin: 0;
-  font-size: 16px;
+.menu-closed:hover {
+	transform: scale(1.05);
 }
 
-.menu-sure h3 {
-  margin: 0 0 4px;
-  font-size: 12px;
-  font-weight: normal;
+.menu-closed:active {
+	transform: scale(0.84);
 }
 
-/* Saved and coming-soon messages */
-.menu h1 {
-  margin: 0 0 7px;
-  padding: 0;
-  font-size: 13px;
-  line-height: 1.2;
-  color: black;
+/*
+ * Appearance of the temporary hamburger displayed during the
+ * reusable opening and closing transition.
+ */
+.menu-transition-hamburger {
+	width: 24px;
+	height: 3px;
+
+	background: var(--menu-glass-lines);
+	border-radius: 999px;
+
+	box-shadow:
+		0 -8px 0 var(--menu-glass-lines),
+		0 8px 0 var(--menu-glass-lines);
+
+	filter:
+		blur(0.45px)
+		drop-shadow(0 0 3px rgba(255, 255, 255, 0.7));
 }
 
-/* Arrows for undo and redo */
+/* Menu-specific vertical arrangement */
+.menu-opened {
+	display: flex;
+	flex-direction: column;
+	gap: var(--glass-control-gap);
+}
+
+/* ------------------------------------------------------------ */
+/* Menu controls                                                 */
+/* ------------------------------------------------------------ */
+
+.menu .menu-action {
+	--glass-control-background: rgba(225, 235, 245, 0.035);
+
+	--glass-control-hover-background:
+		rgba(245, 250, 255, 0.1);
+}
+
+/* Save popup positioning context */
+.menu-save-row {
+	position: relative;
+	overflow: visible;
+}
+
+/* Undo/Redo popup positioning context */
 .menu-arrows {
-  display: flex;
-  gap: 6px;
+	position: relative;
 }
 
-.menu-arrows button {
-  flex: 1;
-  height: 30px;
-  padding: 0;
-  font-size: 18px;
-}
-
+/* Text generated inside the arrow buttons */
 .menu-arrow-left::before {
-  content: "←";
+	content: "Undo";
 }
 
 .menu-arrow-right::before {
-  content: "→";
+	content: "Redo";
+}
+
+/* ------------------------------------------------------------ */
+/* Menu-specific popup text                                      */
+/* ------------------------------------------------------------ */
+
+.menu-coming-soon {
+	--glass-cover-font-size: 13px;
+	--glass-cover-font-weight: 650;
+}
+
+.menu-sure h2 {
+	margin: 0;
+
+	font-size: 17px;
+	text-align: center;
+}
+
+.menu-sure h3 {
+	margin: 0 0 7px;
+
+	font-size: 12px;
+	font-weight: normal;
+	text-align: center;
+
+	opacity: 0.75;
+}
+
+/* ------------------------------------------------------------ */
+/* Are-you-sure popup readability                                */
+/* ------------------------------------------------------------ */
+
+/*
+ * The default glass surface is only 6% opaque, which makes this
+ * popup nearly invisible over the menu's own buttons. Give it a
+ * much more solid frosted background so the warning is legible.
+ */
+.menu .menu-sure {
+	--glass-surface-opacity: 0.72;
+	--glass-blur: 16px;
+
+	box-shadow:
+		inset 0 1px 1px rgba(255, 255, 255, 0.4),
+		0 12px 32px rgba(5, 12, 22, 0.45);
 }
