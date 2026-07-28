@@ -1,7 +1,16 @@
+html, body {
+  height: 100%;
+  background-color: rgb(30, 25, 125);
+  margin: 0;
+  padding: 0;
+}
+
 .home {
   text-align: center;
-  padding: 12rem;
+  padding: 2rem;
   background-color: rgb(30, 25, 125);
+  height: 100%;
+  
 }
 
 .room-viewport {
