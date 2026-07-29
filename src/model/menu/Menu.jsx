@@ -298,44 +298,40 @@ export function Menu({ menuName, updateMenuName, saveRoom, loadRoom, newRoom, se
 						</button>
 
 						<div className="menu-room-actions">
-							<button
-								className={
-									"menu-action " +
-									"glass-surface " +
-									"glass-glow " +
-									"glass-ripple " +
-									"glass-button"
-								}
-								style={{
-									"--glass-surface-opacity": 0.2,
-									"--glass-hover-opacity": 0.25,
-								}}
-								aria-label="Previous room"
-								onClick={() => changeRoomWithVerify(-1)}
-								disabled={typeof changeRoom !== "function"}
-							>
-								Prev Room
-							</button>
+                          <button
+                            className={
+                              "menu-action " +
+                              "glass-surface " +
+                              "glass-glow " +
+                              "glass-ripple " +
+                              "glass-button"
+                            }
+                            style={{
+                            }}
+                            aria-label="Previous room"
+                            onClick={() => changeRoomWithVerify(-1)}
+                            disabled={typeof changeRoom !== "function"}
+                          >
+                            Prev Room
+                          </button>
 
-							<button
-								className={
-									"menu-action " +
-									"glass-surface " +
-									"glass-glow " +
-									"glass-ripple " +
-									"glass-button"
-								}
-								style={{
-									"--glass-surface-opacity": 0.2,
-									"--glass-hover-opacity": 0.25,
-								}}
-								aria-label="Next room"
-								onClick={() => changeRoomWithVerify(1)}
-								disabled={typeof changeRoom !== "function"}
-							>
-								Next Room
-							</button>
-						</div>
+                          <button
+                            className={
+                              "menu-action " +
+                              "glass-surface " +
+                              "glass-glow " +
+                              "glass-ripple " +
+                              "glass-button"
+                            }
+                            style={{
+                            }}
+                            aria-label="Next room"
+                            onClick={() => changeRoomWithVerify(1)}
+                            disabled={typeof changeRoom !== "function"}
+                          >
+                            Next Room
+                          </button>
+                        </div>
 
 						<div className="menu-save-row">
 							<button
