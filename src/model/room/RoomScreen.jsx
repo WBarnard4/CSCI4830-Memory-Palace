@@ -13,10 +13,13 @@ const BASE_VIEWPORT_DIMENSIONS = {
 export default function RoomScreen({ roomData, updateRoomData, openImagePicker, onGoHome, onGoLoad, onGoNew, onChangeRoom }) {  // state which stores ideas
   const [ideas, setIdeas] = useState(roomData.ideas ?? []);
   const [popupPosition, setPopupPosition] = useState(null);
+  const [popupOpen, setPopupOpen] = useState(false);
+  const [popupClosing, setPopupClosing] = useState(false);
 
   // order is just the ideas array order for now, no reordering yet
   const [pathActive, setPathActive] = useState(false);
   const [pathIndex, setPathIndex] = useState(0);
+
 
   const [backgroundDimensions, setBackgroundDimensions] = useState({
     width: 1920,
@@ -83,7 +86,7 @@ export default function RoomScreen({ roomData, updateRoomData, openImagePicker, 
       };
 
       setIdeas((currentIdeas) => [...currentIdeas, newIdea]);
-      setPopupPosition(null);
+      closePopup();
     });
   }
   // On mount: loaded image ideas have dead session URLs — mint fresh ones from their stored blobs
@@ -166,8 +169,24 @@ export default function RoomScreen({ roomData, updateRoomData, openImagePicker, 
   }
 
   function closePopup() {
-    setPopupPosition(null);
+    if (!popupOpen || popupClosing) {
+      return;
+    }
+    setPopupClosing(true);
   }
+
+  function finishPopupAnimation(event) {
+    if (event.target !== event.currentTarget) {
+      return;
+    }
+
+    if (event.animationName === "menu-panel-close") {
+      setPopupOpen(false);
+      setPopupPosition(null)
+      setPopupClosing(false);
+    }
+  }
+
 
   async function addTextIdea() {
     if (!popupPosition) {
@@ -187,7 +206,7 @@ export default function RoomScreen({ roomData, updateRoomData, openImagePicker, 
 
 
     setIdeas([...ideas, newIdea]);
-    setPopupPosition(null);
+    closePopup();
   }
 
   function updateIdea(newInfo) {
@@ -277,6 +296,7 @@ export default function RoomScreen({ roomData, updateRoomData, openImagePicker, 
     const y = ((e.clientY - rect.top) / rect.height) * 100;
 
     console.log(ideas);
+    setPopupOpen(true);
     setPopupPosition({ x, y });
   };
 
@@ -387,15 +407,19 @@ export default function RoomScreen({ roomData, updateRoomData, openImagePicker, 
         </div>
 
         {/* Popup on double click */}
-        {popupPosition && (
+        {popupOpen && (
           <div
+            className={"glass-surface menu-transition-panel menu-transition-from-center" + (popupClosing ? " menu-transition-closing" : "")}
+            onAnimationEnd={finishPopupAnimation}
             style={{
               position: "absolute",
               left: `${popupPosition.x}%`,
               top: `${popupPosition.y}%`,
               transform: "translate(-50%, -50%)",
-              backgroundColor: "white",
-              border: "2px solid black",
+              border: "2px solid white",
+              width: "150px",
+              height: "100px",
+              boxSizing: "border-box",
               borderRadius: "8px",
               padding: "1rem",
               zIndex: 9,
@@ -405,14 +429,40 @@ export default function RoomScreen({ roomData, updateRoomData, openImagePicker, 
             onDoubleClick={(e) => e.stopPropagation()}
             onClick={(e) => e.stopPropagation()}
           >
-            <button onClick={closePopup}>X</button>
+            <div className="menu-transition-content">
+              <button
+                className="glass-button glass-surface glass-glow"
+                style={{
+                  borderRadius: "4px",
+                }}
+                onClick={closePopup}
+              >
+                X
+              </button>
 
-            <div
-              style={{ marginTop: "1rem" }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button onClick={addTextIdea}>Text</button>
-              <button onClick={pickIdeaImage}>Image</button>
+              <div
+                style={{ marginTop: "1rem" }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <button
+                  className="glass-button glass-surface glass-glow glass-button"
+                  style={{
+                    borderRadius: "4px",
+                  }}
+                  onClick={addTextIdea}
+                >
+                  Text
+                </button>
+                <button
+                  className="glass-button glass-surface glass-glow glass-button"
+                  style={{
+                    borderRadius: "4px",
+                  }}
+                  onClick={pickIdeaImage}
+                >
+                  Image
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -426,6 +476,6 @@ export default function RoomScreen({ roomData, updateRoomData, openImagePicker, 
         onPrev={prevPathStep}
         onNext={nextPathStep}
       />
-    </div>
+    </div >
   );
 }
