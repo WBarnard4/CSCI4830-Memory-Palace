@@ -367,6 +367,8 @@ export function Idea({ id, type, x, y, w, h, r, title, text, roomBaseDimensions,
         onPointerUp={endPointer}
         onPointerCancel={endPointer}
         style={{
+          "--glass-surface-opacity": 0.2,
+          "--glass-hover-opacity": 0.25,
           position: "absolute",
           left: `${shownX}%`,
           top: `${shownY}%`,
