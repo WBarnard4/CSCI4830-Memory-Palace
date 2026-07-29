@@ -270,8 +270,6 @@ export function Menu({ menuName, updateMenuName, saveRoom, loadRoom, newRoom, se
                               "glass-button"
                             }
                             style={{
-                              "--glass-surface-opacity": 0.2,
-                              "--glass-hover-opacity": 0.25,
                             }}
                             aria-label="Next room"
                             onClick={() => changeRoomWithVerify(1)}
