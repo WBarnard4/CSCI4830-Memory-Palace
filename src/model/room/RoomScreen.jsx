@@ -14,10 +14,13 @@ export default function RoomScreen({ roomData, updateRoomData, openImagePicker, 
   // state which stores ideas
   const [ideas, setIdeas] = useState(roomData.ideas ?? []);
   const [popupPosition, setPopupPosition] = useState(null);
+  const [popupOpen, setPopupOpen] = useState(false);
+  const [popupClosing, setPopupClosing] = useState(false);
 
   // order is just the ideas array order for now, no reordering yet
   const [pathActive, setPathActive] = useState(false);
   const [pathIndex, setPathIndex] = useState(0);
+
 
   const [backgroundDimensions, setBackgroundDimensions] = useState({
     width: 1920,
@@ -84,7 +87,7 @@ export default function RoomScreen({ roomData, updateRoomData, openImagePicker, 
       };
 
       setIdeas((currentIdeas) => [...currentIdeas, newIdea]);
-      setPopupPosition(null);
+      closePopup();
     });
   }
   // On mount: loaded image ideas have dead session URLs — mint fresh ones from their stored blobs
@@ -167,8 +170,24 @@ export default function RoomScreen({ roomData, updateRoomData, openImagePicker, 
   }
 
   function closePopup() {
-    setPopupPosition(null);
+    if (!popupOpen || popupClosing) {
+      return;
+    }
+    setPopupClosing(true);
   }
+
+  function finishPopupAnimation(event) {
+    if (event.target !== event.currentTarget) {
+      return;
+    }
+
+    if (event.animationName === "menu-panel-close") {
+      setPopupOpen(false);
+      setPopupPosition(null)
+      setPopupClosing(false);
+    }
+  }
+
 
   async function addTextIdea() {
     if (!popupPosition) {
@@ -188,7 +207,7 @@ export default function RoomScreen({ roomData, updateRoomData, openImagePicker, 
 
 
     setIdeas([...ideas, newIdea]);
-    setPopupPosition(null);
+    closePopup();
   }
 
   function updateIdea(newInfo) {
@@ -269,6 +288,7 @@ export default function RoomScreen({ roomData, updateRoomData, openImagePicker, 
     const y = ((e.clientY - rect.top) / rect.height) * 100;
 
     console.log(ideas);
+    setPopupOpen(true);
     setPopupPosition({ x, y });
   };
 
@@ -378,9 +398,10 @@ export default function RoomScreen({ roomData, updateRoomData, openImagePicker, 
         </div>
 
         {/* Popup on double click */}
-        {popupPosition && (
+        {popupOpen && (
           <div
-            className="glass-surface menu-transition-panel menu-transition-from-center"
+            className={"glass-surface menu-transition-panel menu-transition-from-center" + (popupClosing ? " menu-transition-closing" : "")}
+            onAnimationEnd={finishPopupAnimation}
             style={{
               position: "absolute",
               left: `${popupPosition.x}%`,
@@ -390,7 +411,6 @@ export default function RoomScreen({ roomData, updateRoomData, openImagePicker, 
               width: "150px",
               height: "100px",
               boxSizing: "border-box",
-
               borderRadius: "8px",
               padding: "1rem",
               zIndex: 9,
@@ -416,7 +436,7 @@ export default function RoomScreen({ roomData, updateRoomData, openImagePicker, 
                 onClick={(e) => e.stopPropagation()}
               >
                 <button
-                  className="glass-button glass-surface glass-glow"
+                  className="glass-button glass-surface glass-glow glass-button"
                   style={{
                     borderRadius: "4px",
                   }}
@@ -425,7 +445,7 @@ export default function RoomScreen({ roomData, updateRoomData, openImagePicker, 
                   Text
                 </button>
                 <button
-                  className="glass-button glass-surface glass-glow"
+                  className="glass-button glass-surface glass-glow glass-button"
                   style={{
                     borderRadius: "4px",
                   }}

@@ -1,7 +1,12 @@
 import { useState, useRef, useLayoutEffect } from "react";
 
 export function Idea({ id, type, x, y, w, h, r, title, text, roomBaseDimensions, imageId, imageSrc, highlighted, pathHighlighted, pathActive, zIndex, updateIdea, deleteIdea, openImagePicker, moveIdeaBack, moveIdeaForward, isFirst, isLast, roomRef }) {
-  const [menuActive, toggleMenu] = useState(false);
+  const [menuActive, setMenuActive] = useState(false);
+  const [menuClosing, setMenuClosing] = useState(false);
+  const [menuDeleting, setMenuDeleting] = useState(false);
+
+  const [ideaShown, setIdeaShown] = useState(false);
+  const [menuShown, setMenuShown] = useState(false);
 
   // Live position/width while a drag or resize gesture is in
   // progress. Committed to RoomScreen state only on release so
@@ -287,7 +292,11 @@ export function Idea({ id, type, x, y, w, h, r, title, text, roomBaseDimensions,
     if (!gesture.moved) {
       // Pointer never really moved: this was a plain click.
       if (gesture.kind === "move") {
-        toggleMenu(!menuActive);
+        if (menuActive) {
+          closeMenu();
+        } else {
+          setMenuActive(true);
+        }
       }
     } else if (gesture.kind === "move") {
       updateIdea({ ...ideaInfo, x: gesture.lastX, y: gesture.lastY });
@@ -326,12 +335,14 @@ export function Idea({ id, type, x, y, w, h, r, title, text, roomBaseDimensions,
       newText = ideaInfo.text;
     }
 
-    toggleMenu(false);
     updateIdea({ ...ideaInfo, title: newTitle, text: newText });
+    closeMenu();
   }
 
   function handleDelete() {
-    deleteIdea(ideaInfo.id);
+    setMenuDeleting(true);
+    setIdeaShown(false);
+    closeMenu();
   }
 
   function chooseNewImage() {
@@ -356,10 +367,49 @@ export function Idea({ id, type, x, y, w, h, r, title, text, roomBaseDimensions,
     moveIdeaForward(ideaInfo.id);
   }
 
+  function closeMenu() {
+    if (!menuActive || menuClosing) {
+      return;
+    }
+    setMenuShown(false);
+    setMenuClosing(true);
+  }
+
+  function finishIdeaAnimation(event) {
+    if (event.target !== event.currentTarget) {
+      return;
+    }
+    if (event.animationName === "menu-panel-open") {
+      setIdeaShown(true);
+    }
+  }
+
+  function finishMenuAnimation(event) {
+    if (event.target !== event.currentTarget) {
+      return;
+    }
+
+    if (event.animationName === "menu-panel-open") {
+      setMenuShown(true);
+    }
+
+    if (event.animationName === "menu-panel-close") {
+      setMenuShown(false);
+      if (menuDeleting) {
+        deleteIdea(ideaInfo.id);
+      }
+      setMenuActive(false);
+      setMenuClosing(false);
+    }
+  }
+
+
+
   return (
     <div>
       <div
-        className="glass-surface glass-glow glass-button menu-transition-panel menu-transition-from-center"
+        className={"glass-surface glass-glow glass-button" + (!ideaShown ? " menu-transition-panel menu-transition-from-center" : "") + (menuDeleting ? " menu-transition-closing" : "")}
+        onAnimationEnd={finishIdeaAnimation}
         key={ideaInfo.id}
         ref={boxRef}
         onPointerDown={pathActive ? undefined : startMove}
@@ -367,6 +417,7 @@ export function Idea({ id, type, x, y, w, h, r, title, text, roomBaseDimensions,
         onPointerUp={endPointer}
         onPointerCancel={endPointer}
         style={{
+          "--menu-closed-size": "10px",
           "--glass-surface-opacity": 0.2,
           "--glass-hover-opacity": 0.25,
           position: "absolute",
@@ -513,7 +564,8 @@ export function Idea({ id, type, x, y, w, h, r, title, text, roomBaseDimensions,
       </div>
       {menuActive && (
         <div
-          className="idea-menu glass-surface menu-transition-panel menu-transition-from-center"
+          className={"idea-menu glass-surface" + (!menuShown ? " menu-transition-panel menu-transition-from-center" : "") + (menuClosing ? " menu-transition-closing" : "")}
+          onAnimationEnd={finishMenuAnimation}
           style={{
             position: "absolute",
             left: `${editorX}%`,
@@ -529,7 +581,6 @@ export function Idea({ id, type, x, y, w, h, r, title, text, roomBaseDimensions,
 
           <div className="menu-transition-content">
             <form
-              onBlur={setInfo}
               onSubmit={setInfo}
             >
               <div>
