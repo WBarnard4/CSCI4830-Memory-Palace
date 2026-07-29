@@ -1,7 +1,18 @@
 import "./PathNav.css";
 import { useEffect, useState } from "react";
 
-// small floating prev/next thing, only shows up once you hit start
+/**
+  * Small floating prev/next control for the memory path. Only shows
+  * up once a path walk has been started (`active` is true), and
+  * animates itself open/closed to match.
+  *
+  * @param {object} props
+  * @param {boolean} props.active - whether a path walk is in progress.
+  * @param {number} props.pathIndex - index of the current path step.
+  * @param {number} props.total - total number of ideas in the path.
+  * @param {() => void} props.onPrev - goes back to the previous idea.
+  * @param {() => void} props.onNext - advances to the next idea.
+  */
 export function PathNav({ active, pathIndex, total, onPrev, onNext }) {
   const [opened, setOpened] = useState(active);
   const [closing, setClosing] = useState(false);
