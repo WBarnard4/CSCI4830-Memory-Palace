@@ -6,7 +6,7 @@ import { fileURLToPath, URL } from "node:url";
 // http://vite.dev/config/
 export default defineConfig({
   plugin: [react()],
-  base: "/CSCI4830-Memory-Palace/",
+  base: process.env.VERCEL ? "/" : "/CSCI4830-Memory-Palace/",
 
   resolve: {
     alias: {
