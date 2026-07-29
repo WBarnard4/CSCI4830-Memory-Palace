@@ -2,8 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { isValidRoomName } from "@/utils/RoomValidation";
 import "./Menu.css";
 
-export function Menu({ menuName, updateMenuName, saveRoom, loadRoom, newRoom, setBackgroundImage, undo, redo, goHome, areChanges }) {
-	const [opened, setOpened] = useState(false);
+export function Menu({ menuName, updateMenuName, saveRoom, loadRoom, newRoom, setBackgroundImage, undo, redo, goHome, areChanges, changeRoom }) {	const [opened, setOpened] = useState(false);
 	const [closing, setClosing] = useState(false);
 	const [areYouSurePopup, setAreYouSurePopup] = useState(false);
 	const [sureCallback, setSureCallback] = useState(null);
@@ -146,6 +145,18 @@ export function Menu({ menuName, updateMenuName, saveRoom, loadRoom, newRoom, se
 		event.target.blur();
 	}
 
+	/**
+	 * Steps to the neighboring room (+1 next, -1 previous) via the
+	 * room-index buttons, confirming first if there are unsaved
+	 * changes (same guard used for Load/New/Home).
+	 */
+	function changeRoomWithVerify(direction) {
+		if (typeof changeRoom !== "function") {
+		return;
+		}
+		verifyWithPopup(() => changeRoom(direction));
+	}
+
 	function openMenu() {
 		setClosing(false);
 		setOpened(true);
@@ -229,6 +240,46 @@ export function Menu({ menuName, updateMenuName, saveRoom, loadRoom, newRoom, se
 						>
 							Choose Background
 						</button>
+
+						<div className="menu-room-actions">
+                          <button
+                            className={
+                              "menu-action " +
+                              "glass-surface " +
+                              "glass-glow " +
+                              "glass-ripple " +
+                              "glass-button"
+                            }
+                            style={{
+                              "--glass-surface-opacity": 0.2,
+                              "--glass-hover-opacity": 0.25,
+                            }}
+                            aria-label="Previous room"
+                            onClick={() => changeRoomWithVerify(-1)}
+                            disabled={typeof changeRoom !== "function"}
+                          >
+                            Prev Room
+                          </button>
+
+                          <button
+                            className={
+                              "menu-action " +
+                              "glass-surface " +
+                              "glass-glow " +
+                              "glass-ripple " +
+                              "glass-button"
+                            }
+                            style={{
+                              "--glass-surface-opacity": 0.2,
+                              "--glass-hover-opacity": 0.25,
+                            }}
+                            aria-label="Next room"
+                            onClick={() => changeRoomWithVerify(1)}
+                            disabled={typeof changeRoom !== "function"}
+                          >
+                            Next Room
+                          </button>
+                        </div>
 
 						<div className="menu-save-row">
 							<button
