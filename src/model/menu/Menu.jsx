@@ -2,7 +2,27 @@ import { useState, useEffect, useRef } from "react";
 import { isValidRoomName } from "@/utils/RoomValidation";
 import "./Menu.css";
 
-export function Menu({ menuName, updateMenuName, saveRoom, loadRoom, newRoom, setBackgroundImage, undo, redo, goHome, areChanges, changeRoom }) {	const [opened, setOpened] = useState(false);
+/**
+ * Dropdown menu for general room navigation and features. Triggers callbacks for saving, loading, creating rooms,
+ * loading rooms, navigating between rooms, and going back home.
+ *
+ * NOTE: To enable unod/redo, the undo/redo coming soon functions must be replced with the undo and redo callbacks.
+ *
+ * @param {object} props
+ * @param {string} props.menuName - Name of the menu to be displayed.
+ * @param {(name: string) => void} props.updateMenuName - Callback for updating the menu name
+ * @param {() => void} props.saveRoom - Callback to save the room information and ideas.
+ * @param {() => void} props.loadRoom - Callback to trigger a load room.
+ * @param {() => void} props.newRoom - Callback to trigger a new room.
+ * @param {() => void} props.setBackgroundImage - Callback to trigger an image file picker to choose a background image.
+ * @param {() => void} props.undo - Undo button callback function.
+ * @param {() => void} props.redo - Redo button callback function.
+ * @param {() => void} props.goHome - Travel Home from the room.
+ * @param {boolean} props.areChanges - Whether or not changes exist in the room for a chagnes may be lost popup.
+ * @param {(direction: number) => void} props.changeRoom - Callback to change room to the previous or next one.
+ */
+export function Menu({ menuName, updateMenuName, saveRoom, loadRoom, newRoom, setBackgroundImage, undo, redo, goHome, areChanges, changeRoom }) {
+	const [opened, setOpened] = useState(false);
 	const [closing, setClosing] = useState(false);
 	const [areYouSurePopup, setAreYouSurePopup] = useState(false);
 	const [sureCallback, setSureCallback] = useState(null);
@@ -33,7 +53,7 @@ export function Menu({ menuName, updateMenuName, saveRoom, loadRoom, newRoom, se
 
 
 	/**
-	 * Removes the areYouSure popup and sets sureCallback to null.
+	 * Removes the areYouSure popup and resets the sure callback.
 	 */
 	function areYouSureNo() {
 		setAreYouSurePopup(false);
@@ -41,7 +61,7 @@ export function Menu({ menuName, updateMenuName, saveRoom, loadRoom, newRoom, se
 	}
 
 	/**
-	 * Calls sureCallback and removes
+	 * Calls the sureCallback and removes
 	 * the areYouSure popup
 	 */
 	function areYouSureYes() {
@@ -55,8 +75,10 @@ export function Menu({ menuName, updateMenuName, saveRoom, loadRoom, newRoom, se
 	}
 
 	/**
-	 * Verifies with the user they may overwrite
+	 * Verifies using a popup with the user they may overwrite
 	 * data before calling the passed verifyCallback function.
+	 *
+	 * @param {() => void} verifyCallback - callback function for if a user presses Yes.
 	 */
 	function verifyWithPopup(verifyCallback) {
 		if (areChanges()) {
@@ -77,6 +99,10 @@ export function Menu({ menuName, updateMenuName, saveRoom, loadRoom, newRoom, se
 		setShowSavedPopup(true);
 	}
 
+	/**
+	 * Check for when the Save button is pressed to display a
+	 * saved popup for a short duration.
+	 */
 	useEffect(() => {
 		if (showSavedPopup === false) {
 			return;
@@ -94,7 +120,9 @@ export function Menu({ menuName, updateMenuName, saveRoom, loadRoom, newRoom, se
 	/**
 	 * Placeholder until the undo argument is implemented.
 	 *
-	 * Feature coming soon TODO: Implement
+	 * Feature coming soon
+	 *
+	 * NOTE: Remove when undo callback is implemented.
 	 */
 	function undoComingSoon() {
 		setComingSoon(true);
@@ -103,13 +131,18 @@ export function Menu({ menuName, updateMenuName, saveRoom, loadRoom, newRoom, se
 	/**
 	 * Placeholder until the redo argument is implemented.
 	 *
-	 * Feature coming soon TODO: Implement
+	 * Feature coming soon
+	 *
+	 * NOTE: Remove when redo callback is implemented.
 	 */
 	function redoComingSoon() {
 		setComingSoon(true);
 	}
 
-
+	/**
+	 * Check for when the comingSoon state is set to display a
+	 * coming soon popup for a short duration.
+	 */
 	useEffect(() => {
 		if (comingSoon === false) {
 			return;
@@ -124,6 +157,15 @@ export function Menu({ menuName, updateMenuName, saveRoom, loadRoom, newRoom, se
 		};
 	}, [comingSoon]);
 
+	/**
+	 * Callback for the Menu Name box updating.
+	 *
+	 * If the event key is Enter or the type is blur then the name in
+	 * the box is checked to be valid and if so, the updateMenuName callback
+	 * is called with the new name. If it is not, the box is set to the old value.
+	 *
+	 * @param {object} event - event, keypress, etc. that is calling the function.
+	 */
 	function newNameEntered(event) {
 		if (event.key !== "Enter" && event.type !== "blur") {
 			return;
@@ -149,19 +191,27 @@ export function Menu({ menuName, updateMenuName, saveRoom, loadRoom, newRoom, se
 	 * Steps to the neighboring room (+1 next, -1 previous) via the
 	 * room-index buttons, confirming first if there are unsaved
 	 * changes (same guard used for Load/New/Home).
+	 *
+	 * @param {number} direction - Direction to change room in. 1 = left, -1 = right.
 	 */
 	function changeRoomWithVerify(direction) {
 		if (typeof changeRoom !== "function") {
-		return;
+			return;
 		}
 		verifyWithPopup(() => changeRoom(direction));
 	}
 
+	/**
+		* Starts the opening animation from a closed menu.
+		*/
 	function openMenu() {
 		setClosing(false);
 		setOpened(true);
 	}
 
+	/**
+		* Starts the closing animation from an open menu.
+		*/
 	function closeMenu() {
 		if (!opened || closing) {
 			return;
@@ -170,6 +220,12 @@ export function Menu({ menuName, updateMenuName, saveRoom, loadRoom, newRoom, se
 		setClosing(true);
 	}
 
+	/**
+		* Callback for the end of a menu's animation. Resets closing and opened
+		* states on a closing animation finishing.
+		*
+		* @param {object} event - Event finishing an animation.
+		*/
 	function finishMenuAnimation(event) {
 		if (event.target !== event.currentTarget) {
 			return;
@@ -242,44 +298,44 @@ export function Menu({ menuName, updateMenuName, saveRoom, loadRoom, newRoom, se
 						</button>
 
 						<div className="menu-room-actions">
-                          <button
-                            className={
-                              "menu-action " +
-                              "glass-surface " +
-                              "glass-glow " +
-                              "glass-ripple " +
-                              "glass-button"
-                            }
-                            style={{
-                              "--glass-surface-opacity": 0.2,
-                              "--glass-hover-opacity": 0.25,
-                            }}
-                            aria-label="Previous room"
-                            onClick={() => changeRoomWithVerify(-1)}
-                            disabled={typeof changeRoom !== "function"}
-                          >
-                            Prev Room
-                          </button>
+							<button
+								className={
+									"menu-action " +
+									"glass-surface " +
+									"glass-glow " +
+									"glass-ripple " +
+									"glass-button"
+								}
+								style={{
+									"--glass-surface-opacity": 0.2,
+									"--glass-hover-opacity": 0.25,
+								}}
+								aria-label="Previous room"
+								onClick={() => changeRoomWithVerify(-1)}
+								disabled={typeof changeRoom !== "function"}
+							>
+								Prev Room
+							</button>
 
-                          <button
-                            className={
-                              "menu-action " +
-                              "glass-surface " +
-                              "glass-glow " +
-                              "glass-ripple " +
-                              "glass-button"
-                            }
-                            style={{
-                              "--glass-surface-opacity": 0.2,
-                              "--glass-hover-opacity": 0.25,
-                            }}
-                            aria-label="Next room"
-                            onClick={() => changeRoomWithVerify(1)}
-                            disabled={typeof changeRoom !== "function"}
-                          >
-                            Next Room
-                          </button>
-                        </div>
+							<button
+								className={
+									"menu-action " +
+									"glass-surface " +
+									"glass-glow " +
+									"glass-ripple " +
+									"glass-button"
+								}
+								style={{
+									"--glass-surface-opacity": 0.2,
+									"--glass-hover-opacity": 0.25,
+								}}
+								aria-label="Next room"
+								onClick={() => changeRoomWithVerify(1)}
+								disabled={typeof changeRoom !== "function"}
+							>
+								Next Room
+							</button>
+						</div>
 
 						<div className="menu-save-row">
 							<button
