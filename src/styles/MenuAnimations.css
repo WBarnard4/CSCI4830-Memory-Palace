@@ -27,8 +27,8 @@
 	--menu-open-duration: 450ms;
 	--menu-close-duration: 425ms;
 
-	--menu-content-open-duration: 100ms;
-	--menu-content-open-delay: 350ms;
+	--menu-content-open-delay: 200ms;
+	--menu-content-open-duration: 500ms;
 	--menu-content-close-duration: 70ms;
 
 	/* Icon */
