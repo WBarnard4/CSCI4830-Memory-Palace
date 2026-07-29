@@ -380,13 +380,17 @@ export default function RoomScreen({ roomData, updateRoomData, openImagePicker, 
         {/* Popup on double click */}
         {popupPosition && (
           <div
+            className="glass-surface menu-transition-panel menu-transition-from-center"
             style={{
               position: "absolute",
               left: `${popupPosition.x}%`,
               top: `${popupPosition.y}%`,
               transform: "translate(-50%, -50%)",
-              backgroundColor: "white",
-              border: "2px solid black",
+              border: "2px solid white",
+              width: "150px",
+              height: "100px",
+              boxSizing: "border-box",
+
               borderRadius: "8px",
               padding: "1rem",
               zIndex: 9,
@@ -396,14 +400,40 @@ export default function RoomScreen({ roomData, updateRoomData, openImagePicker, 
             onDoubleClick={(e) => e.stopPropagation()}
             onClick={(e) => e.stopPropagation()}
           >
-            <button onClick={closePopup}>X</button>
+            <div className="menu-transition-content">
+              <button
+                className="glass-button glass-surface glass-glow"
+                style={{
+                  borderRadius: "4px",
+                }}
+                onClick={closePopup}
+              >
+                X
+              </button>
 
-            <div
-              style={{ marginTop: "1rem" }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button onClick={addTextIdea}>Text</button>
-              <button onClick={pickIdeaImage}>Image</button>
+              <div
+                style={{ marginTop: "1rem" }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <button
+                  className="glass-button glass-surface glass-glow"
+                  style={{
+                    borderRadius: "4px",
+                  }}
+                  onClick={addTextIdea}
+                >
+                  Text
+                </button>
+                <button
+                  className="glass-button glass-surface glass-glow"
+                  style={{
+                    borderRadius: "4px",
+                  }}
+                  onClick={pickIdeaImage}
+                >
+                  Image
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -417,6 +447,6 @@ export default function RoomScreen({ roomData, updateRoomData, openImagePicker, 
         onPrev={prevPathStep}
         onNext={nextPathStep}
       />
-    </div>
+    </div >
   );
 }

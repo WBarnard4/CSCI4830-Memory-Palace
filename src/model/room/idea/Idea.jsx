@@ -359,7 +359,7 @@ export function Idea({ id, type, x, y, w, h, r, title, text, roomBaseDimensions,
   return (
     <div>
       <div
-        className="glass-surface glass-glow glass-button"
+        className="glass-surface glass-glow glass-button menu-transition-panel menu-transition-from-center"
         key={ideaInfo.id}
         ref={boxRef}
         onPointerDown={pathActive ? undefined : startMove}
@@ -513,7 +513,7 @@ export function Idea({ id, type, x, y, w, h, r, title, text, roomBaseDimensions,
       </div>
       {menuActive && (
         <div
-          className="idea-menu glass-surface"
+          className="idea-menu glass-surface menu-transition-panel menu-transition-from-center"
           style={{
             position: "absolute",
             left: `${editorX}%`,
@@ -527,88 +527,90 @@ export function Idea({ id, type, x, y, w, h, r, title, text, roomBaseDimensions,
           }}
         >
 
-          <form
-            onBlur={setInfo}
-            onSubmit={setInfo}
-          >
-            <div>
-              <label>Title</label>
-              <br />
-              <textarea
-                className="glass-surface glass-glow glass-ripple"
-                defaultValue={ideaInfo.title}
-                name="title"
-                rows="1"
-                style={{
-                  width: "100%",
-                  resize: "none"
-                }}
-              />
-              <br />
-
-              <label>Description</label>
-              <br />
-              <textarea
-                className="glass-surface glass-glow glass-ripple"
-                defaultValue={ideaInfo.text}
-                name="text"
-                style={{
-                  width: "100%",
-                }}
-              />
-            </div>
-
-            {ideaInfo.type === "image" ? (
-              <>
-                <button
-                  className="glass-surface glass-glow glass-ripple glass-button"
-                  type="button"
-                  onClick={chooseNewImage}>
-                  Select Image
-                </button>
+          <div className="menu-transition-content">
+            <form
+              onBlur={setInfo}
+              onSubmit={setInfo}
+            >
+              <div>
+                <label>Title</label>
                 <br />
-              </>
-            ) : (
-              <>
-              </>
-            )}
+                <textarea
+                  className="glass-surface glass-glow glass-ripple"
+                  defaultValue={ideaInfo.title}
+                  name="title"
+                  rows="1"
+                  style={{
+                    width: "100%",
+                    resize: "none"
+                  }}
+                />
+                <br />
 
-            <button
-              className="glass-surface glass-glow glass-ripple glass-button"
-              type="button"
-              onClick={toggleHighlight}
-            >
-              {ideaInfo.highlighted ? "Remove Highlight" : "Highlight"}
-            </button>
+                <label>Description</label>
+                <br />
+                <textarea
+                  className="glass-surface glass-glow glass-ripple"
+                  defaultValue={ideaInfo.text}
+                  name="text"
+                  style={{
+                    width: "100%",
+                  }}
+                />
+              </div>
 
-            <button
-              className="glass-surface glass-glow glass-ripple glass-button"
-              type="button"
-              onClick={handleMoveBack}
-              disabled={isFirst}
-            >
-              ← Back
-            </button>
-            <button
-              className="glass-surface glass-glow glass-ripple glass-button"
-              type="button" onClick={handleMoveForward} disabled={isLast}>
-              Forward →
-            </button>
-            <br />
+              {ideaInfo.type === "image" ? (
+                <>
+                  <button
+                    className="glass-surface glass-glow glass-ripple glass-button"
+                    type="button"
+                    onClick={chooseNewImage}>
+                    Select Image
+                  </button>
+                  <br />
+                </>
+              ) : (
+                <>
+                </>
+              )}
 
-            <br />
-            <button
-              className="glass-surface glass-glow glass-button"
-              type="submit">
-              Submit
-            </button>
-            <button
-              className="glass-surface glass-glow glass-button"
-              type="button"
-              onClick={handleDelete}>
-              Delete Idea
-            </button>
-          </form>
+              <button
+                className="glass-surface glass-glow glass-ripple glass-button"
+                type="button"
+                onClick={toggleHighlight}
+              >
+                {ideaInfo.highlighted ? "Remove Highlight" : "Highlight"}
+              </button>
+
+              <button
+                className="glass-surface glass-glow glass-ripple glass-button"
+                type="button"
+                onClick={handleMoveBack}
+                disabled={isFirst}
+              >
+                ← Back
+              </button>
+              <button
+                className="glass-surface glass-glow glass-ripple glass-button"
+                type="button" onClick={handleMoveForward} disabled={isLast}>
+                Forward →
+              </button>
+              <br />
+
+              <br />
+              <button
+                className="glass-surface glass-glow glass-button"
+                type="submit">
+                Submit
+              </button>
+              <button
+                className="glass-surface glass-glow glass-button"
+                type="button"
+                onClick={handleDelete}>
+                Delete Idea
+              </button>
+            </form>
+          </div>
         </div>
       )}
     </div>

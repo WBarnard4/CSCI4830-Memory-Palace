@@ -75,7 +75,7 @@ export default function NewRoomScreen({ isOpen, onClose, onGoHome, openImagePick
             >
                 &#8592;
             </button>
-            <div className="room-grid">
+            <div className="room-grid menu-transition-content menu-transition-panel" style={{"--menu-content-open-delay": "0ms"}}>
                 {/* Preset background cards; the chosen one glows */}
                 {[
                     { name: "Bedroom", url: bedroomUrl },
