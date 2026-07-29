@@ -360,6 +360,7 @@ export default function RoomScreen({ roomData, updateRoomData, openImagePicker, 
                 imageSrc={idea.imageSrc}
                 highlighted={idea.highlighted}
                 pathHighlighted={idea.id === currentPathId}
+                pathActive={pathActive}
                 zIndex={zIndex}
                 updateIdea={updateIdea}
                 deleteIdea={deleteIdea}

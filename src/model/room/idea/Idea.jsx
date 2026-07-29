@@ -1,6 +1,6 @@
 import { useState, useRef, useLayoutEffect } from "react";
 
-export function Idea({ id, type, x, y, w, h, r, title, text, roomBaseDimensions, imageId, imageSrc, highlighted, pathHighlighted, zIndex, updateIdea, deleteIdea, openImagePicker, moveIdeaBack, moveIdeaForward, isFirst, isLast, roomRef }) {
+export function Idea({ id, type, x, y, w, h, r, title, text, roomBaseDimensions, imageId, imageSrc, highlighted, pathHighlighted, pathActive, zIndex, updateIdea, deleteIdea, openImagePicker, moveIdeaBack, moveIdeaForward, isFirst, isLast, roomRef }) {
   const [menuActive, toggleMenu] = useState(false);
 
   // Live position/width while a drag or resize gesture is in
@@ -359,13 +359,16 @@ export function Idea({ id, type, x, y, w, h, r, title, text, roomBaseDimensions,
   return (
     <div>
       <div
+        className="glass-surface glass-glow glass-button"
         key={ideaInfo.id}
         ref={boxRef}
-        onPointerDown={startMove}
+        onPointerDown={pathActive ? undefined : startMove}
         onPointerMove={movePointer}
         onPointerUp={endPointer}
         onPointerCancel={endPointer}
         style={{
+          "--glass-surface-opacity": 0.2,
+          "--glass-hover-opacity": 0.25,
           position: "absolute",
           left: `${shownX}%`,
           top: `${shownY}%`,
@@ -373,14 +376,13 @@ export function Idea({ id, type, x, y, w, h, r, title, text, roomBaseDimensions,
           height: shownH != null ? `${shownH}%` : "auto",
           boxSizing: "border-box",
           transform: `translate(-50%, -50%) rotate(${shownR}deg)`,
-          backgroundColor: "white",
           padding: "10px",
           border: isHighlighted
             ? "2px solid #ffd700"
-            : "2px solid black",
+            : "0px solid black",
           borderRadius: "8px",
           color: "black",
-          cursor: dragPos !== null ? "grabbing" : "grab",
+          cursor: pathActive ? "default" : dragPos !== null ? "grabbing" : "grab",
           touchAction: "none",
           userSelect: "none",
           overflowWrap: "break-word",
@@ -461,72 +463,79 @@ export function Idea({ id, type, x, y, w, h, r, title, text, roomBaseDimensions,
         )}
 
         {/* Top handle for rotating */}
-        <div
-          onPointerDown={startRotate}
-          onPointerMove={movePointer}
-          onPointerUp={endPointer}
-          onPointerCancel={endPointer}
-          aria-hidden="true"
-          style={{
-            position: "absolute",
-            top: "-22px",
-            left: "50%",
-            transform: "translateX(-50%)",
-            width: "14px",
-            height: "14px",
-            borderRadius: "50%",
-            background: "white",
-            border: "2px solid #2f6fd0",
-            cursor: "grab",
-            touchAction: "none",
-            zIndex: 2,
-          }}
-        />
+        {!pathActive && (
+          <div
+            onPointerDown={startRotate}
+            onPointerMove={movePointer}
+            onPointerUp={endPointer}
+            onPointerCancel={endPointer}
+            aria-hidden="true"
+            style={{
+              position: "absolute",
+              top: "-22px",
+              left: "50%",
+              transform: "translateX(-50%)",
+              width: "14px",
+              height: "14px",
+              borderRadius: "50%",
+              background: "white",
+              border: "2px solid #2f6fd0",
+              cursor: "grab",
+              touchAction: "none",
+              zIndex: 2,
+            }}
+          />
+        )}
 
         {/* Corner drag handle for resizing */}
-        <div
-          onPointerDown={startResize}
-          onPointerMove={movePointer}
-          onPointerUp={endPointer}
-          onPointerCancel={endPointer}
-          aria-hidden="true"
-          style={{
-            position: "absolute",
-            right: "-7px",
-            bottom: "-7px",
-            width: "14px",
-            height: "14px",
-            borderRadius: "50%",
-            background: "white",
-            border: "2px solid black",
-            cursor: "nwse-resize",
-            touchAction: "none",
-            zIndex: 2,
-          }}
-        />
+        {!pathActive && (
+          <div
+            onPointerDown={startResize}
+            onPointerMove={movePointer}
+            onPointerUp={endPointer}
+            onPointerCancel={endPointer}
+            aria-hidden="true"
+            style={{
+              position: "absolute",
+              right: "-7px",
+              bottom: "-7px",
+              width: "14px",
+              height: "14px",
+              borderRadius: "50%",
+              background: "white",
+              border: "2px solid black",
+              cursor: "nwse-resize",
+              touchAction: "none",
+              zIndex: 2,
+            }}
+          />
+        )}
       </div>
       {menuActive && (
-        <div className="idea-menu"
+        <div
+          className="idea-menu glass-surface"
           style={{
             position: "absolute",
             left: `${editorX}%`,
             top: `${editorY}%`,
             transform: "translate(-50%, -50%)",
-            backgroundColor: "white",
             padding: "10px",
-            border: "2px solid black",
-            borderRadius: "8px",
+            border: "2px solid white",
             color: "black",
-            boxShadow: "0 4px 6px rgba(0,0,0,0.3)",
             // Above every idea (highlighted ideas reach 1000+n)
             zIndex: 3000,
-          }}>
+          }}
+        >
 
-          <form onSubmit={setInfo}>
+          <form
+            onBlur={setInfo}
+            onSubmit={setInfo}
+          >
             <div>
               <label>Title</label>
               <br />
               <textarea
+                className="glass-surface glass-glow glass-ripple"
                 defaultValue={ideaInfo.title}
                 name="title"
                 rows="1"
@@ -540,6 +549,7 @@ export function Idea({ id, type, x, y, w, h, r, title, text, roomBaseDimensions,
               <label>Description</label>
               <br />
               <textarea
+                className="glass-surface glass-glow glass-ripple"
                 defaultValue={ideaInfo.text}
                 name="text"
                 style={{
@@ -550,7 +560,12 @@ export function Idea({ id, type, x, y, w, h, r, title, text, roomBaseDimensions,
 
             {ideaInfo.type === "image" ? (
               <>
-                <button type="button" onClick={chooseNewImage}>Select Image</button>
+                <button
+                  className="glass-surface glass-glow glass-ripple glass-button"
+                  type="button"
+                  onClick={chooseNewImage}>
+                  Select Image
+                </button>
                 <br />
               </>
             ) : (
@@ -558,21 +573,41 @@ export function Idea({ id, type, x, y, w, h, r, title, text, roomBaseDimensions,
               </>
             )}
 
-            <button type="button" onClick={toggleHighlight}>
+            <button
+              className="glass-surface glass-glow glass-ripple glass-button"
+              type="button"
+              onClick={toggleHighlight}
+            >
               {ideaInfo.highlighted ? "Remove Highlight" : "Highlight"}
             </button>
 
-            <button type="button" onClick={handleMoveBack} disabled={isFirst}>
+            <button
+              className="glass-surface glass-glow glass-ripple glass-button"
+              type="button"
+              onClick={handleMoveBack}
+              disabled={isFirst}
+            >
               ← Back
             </button>
-            <button type="button" onClick={handleMoveForward} disabled={isLast}>
+            <button
+              className="glass-surface glass-glow glass-ripple glass-button"
+              type="button" onClick={handleMoveForward} disabled={isLast}>
               Forward →
             </button>
             <br />
 
             <br />
-            <button type="submit">Submit</button>
-            <button type="button" onClick={handleDelete}>Delete Idea</button>
+            <button
+              className="glass-surface glass-glow glass-button"
+              type="submit">
+              Submit
+            </button>
+            <button
+              className="glass-surface glass-glow glass-button"
+              type="button"
+              onClick={handleDelete}>
+              Delete Idea
+            </button>
           </form>
         </div>
       )}
