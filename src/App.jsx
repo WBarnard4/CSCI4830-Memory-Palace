@@ -13,7 +13,7 @@ import RoomScreen from "@/model/room/RoomScreen.jsx";
 
 import RoomFactory from "@/utils/RoomFactory.jsx";
 
-import { saveImage, createRoom, updateRoomName } from "@/db/db.js";
+import { saveImage, createRoom, updateRoomName, loadRoom, getAdjacentRoomId } from "@/db/db.js";
 
 
 
@@ -77,6 +77,28 @@ function App() {
   }
 
   /**
+   * Loads the neighboring room (+1 next, -1 previous, by room index)
+   * and swaps it in as the active room. Does nothing if there's no
+   * other saved room to switch to.
+   * @param {number} direction - +1 for next room, -1 for previous room.
+   */
+  async function changeRoomByOffset(direction) {
+    if (!activeRoom) {
+      return;
+    }
+
+    const neighborId = await getAdjacentRoomId(activeRoom.id, direction);
+    if (neighborId == null || neighborId === activeRoom.id) {
+      return;
+    }
+
+    const neighborRoom = await loadRoom(neighborId);
+    if (neighborRoom) {
+      setActiveRoom(neighborRoom);
+    }
+  }
+
+  /**
    * Calls setHomeState() to render certain screen components.
    * @param {number} button - state from STATES.
    */
@@ -113,12 +135,14 @@ function App() {
   if (activeRoom) {
     appScreen = (
       <RoomScreen
+        key={activeRoom.id}
         roomData={activeRoom}
         updateRoomData={updateActiveRoom}
         onGoHome={() => handleGoTo(HOME_STATES.MAIN)}
         openImagePicker={openImagePicker}
         onGoLoad={() => handleGoTo(HOME_STATES.LOAD)}
         onGoNew={() => handleGoTo(HOME_STATES.NEW)}
+        onChangeRoom={changeRoomByOffset}
       />
     );
     // Home screen navigation, contains all main screen components and renders them based on homeState.
