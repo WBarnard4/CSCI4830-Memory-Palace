@@ -1,8 +1,20 @@
 import { useState, useRef, useEffect } from "react";
 import "./PathMenu.css";
 
-// dropdown for the memory path - shows order (just insertion order for now,
-// no drag/reorder yet) and lets you step through highlighting them
+/**
+ * Dropdown menu for the memory path. Shows ideas in path order (just
+ * insertion order for now, no drag/reorder yet) and lets the user
+ * step through highlighting them one at a time.
+ *
+ * @param {object} props
+ * @param {Array<object>} props.ideas - ideas in path order.
+ * @param {boolean} props.pathActive - whether a path walk is in progress.
+ * @param {number} props.pathIndex - index of the currently highlighted idea.
+ * @param {() => void} props.onStart - begins the path walk.
+ * @param {() => void} props.onNext - advances to the next idea.
+ * @param {() => void} props.onPrev - goes back to the previous idea.
+ * @param {() => void} props.onStop - ends the path walk.
+ */
 export function PathMenu({ ideas, pathActive, pathIndex, onStart, onNext, onPrev, onStop }) {
   const [opened, setOpened] = useState(false);
   const [closing, setClosing] = useState(false);
@@ -28,20 +40,24 @@ export function PathMenu({ ideas, pathActive, pathIndex, onStart, onNext, onPrev
     };
   }, [opened, closing]);
 
+  /** Shortens an idea's title for display in the path list. */
   function label(idea) {
     return idea.title ? idea.title.slice(0, 20) : "Untitled";
   }
 
+  /** Closes the menu and starts the memory path walk */
   function startPath() {
     closeMenu();
     onStart();
   }
 
+  /** Opens the path menu panel. */
   function openMenu() {
     setClosing(false);
     setOpened(true);
   }
 
+  /** Begins the closing animation for the path menu panel. */
   function closeMenu() {
     if (!opened || closing) {
       return;
@@ -50,6 +66,7 @@ export function PathMenu({ ideas, pathActive, pathIndex, onStart, onNext, onPrev
     setClosing(true);
   }
 
+  /** Marks the panel as fully closed once its close animation ends. */
   function finishMenuAnimation(event) {
     if (event.target !== event.currentTarget) {
       return;

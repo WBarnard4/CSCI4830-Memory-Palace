@@ -10,8 +10,7 @@ const BASE_VIEWPORT_DIMENSIONS = {
   height: 1080,
 }
 
-export default function RoomScreen({ roomData, updateRoomData, openImagePicker, onGoHome, onGoLoad, onGoNew }) {
-  // state which stores ideas
+export default function RoomScreen({ roomData, updateRoomData, openImagePicker, onGoHome, onGoLoad, onGoNew, onChangeRoom }) {  // state which stores ideas
   const [ideas, setIdeas] = useState(roomData.ideas ?? []);
   const [popupPosition, setPopupPosition] = useState(null);
   const [popupOpen, setPopupOpen] = useState(false);
@@ -226,6 +225,7 @@ export default function RoomScreen({ roomData, updateRoomData, openImagePicker, 
     }
   }
 
+  /** Swaps an idea one step earlier in the ideas/path order. */
   function moveIdeaBack(id) {
     setIdeas((prev) => {
       const index = prev.findIndex((idea) => idea.id === id);
@@ -236,6 +236,7 @@ export default function RoomScreen({ roomData, updateRoomData, openImagePicker, 
     });
   }
 
+  /** Swaps an idea one step later in the ideas/path order. */
   function moveIdeaForward(id) {
     setIdeas((prev) => {
       const index = prev.findIndex((idea) => idea.id === id);
@@ -245,21 +246,28 @@ export default function RoomScreen({ roomData, updateRoomData, openImagePicker, 
       return updated;
     });
   }
-
+ 
+  /**
+    * Begins walking the memory path, starting at the first idea.
+    * Does nothing if the room has no ideas to walk through.
+    */
   function startPath() {
     if (ideas.length === 0) return;
     setPathActive(true);
     setPathIndex(0);
   }
 
+  /** Ends the active memory path walk. */
   function stopPath() {
     setPathActive(false);
   }
 
+  /** Advances the path to the next idea, clamped to the last idea. */
   function nextPathStep() {
     setPathIndex((i) => Math.min(i + 1, ideas.length - 1));
   }
 
+  /** Moves the path back to the previous idea, clamped to the first idea. */
   function prevPathStep() {
     setPathIndex((i) => Math.max(i - 1, 0));
   }
@@ -312,6 +320,7 @@ export default function RoomScreen({ roomData, updateRoomData, openImagePicker, 
           areChanges={() => true}
           menuName={roomData.name}
           updateMenuName={updateRoomName}
+          changeRoom={onChangeRoom}
         />
       </div>
 

@@ -52,6 +52,31 @@ export async function getAllRooms() {
   return rooms;
 }
 
+/**
+ * Finds the room adjacent to the given room in the saved-room list
+ * (same newest-first order as getAllRooms) and returns its id.
+ *
+ * @param {number} currentRoomId - id of the room currently open.
+ * @param {number} direction - +1 for next room, -1 for previous room.
+ * @returns {Promise<number|null>} the neighbor room's id, or null if
+ *   there is no other room to switch to.
+ */
+export async function getAdjacentRoomId(currentRoomId, direction) {
+  const rooms = await db.rooms.orderBy("id").reverse().toArray();
+  if (rooms.length <= 1) {
+    return null;
+  }
+
+  const currentIndex = rooms.findIndex((room) => room.id === currentRoomId);
+  if (currentIndex === -1) {
+    return null;
+  }
+
+  // Wrap around so +/- keeps cycling through the room list.
+  const nextIndex = (currentIndex + direction + rooms.length) % rooms.length;
+  return rooms[nextIndex].id;
+}
+
 export async function updateRoomName(roomId, roomName) {
   await db.rooms.update(roomId, {
     name: roomName,
