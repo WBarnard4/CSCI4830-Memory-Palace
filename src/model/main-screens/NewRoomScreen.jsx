@@ -26,7 +26,7 @@ const DEFAULT_NAME = "New Room Name"
  * @param {object} props
  * @param {number} props.isOpen - Passed from App to enable or disable component.
  * @param {() => void} props.onClose - Callback to pass new Room data to be rendered in App.
- * @param {() => void} props.onGoHome - Callback to enable HomseScreen compoment.
+ * @param {() => void} props.onGoHome - Callback to enable HomeScreen compoment.
  * @param {() => void} props.openImagePicker - Callback to open image picker from App.
  
  * @returns {JSX.Element} The template Room cards and creation buttons.

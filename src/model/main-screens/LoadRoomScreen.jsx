@@ -20,7 +20,7 @@ const STATES = HOME_STATES;
  * @param {object} props
  * @param {number} props.isOpen - Passed from App to enable or disable component.
  * @param {() => void} props.onClose - Callback to enable HomeScreen component in App.
- * @param {() => void} props.onCloseLoad - Callback to enable HomseScreen compoment and set selected Room to active.
+ * @param {() => void} props.onCloseLoad - Callback to enable HomeScreen compoment and set selected Room to active.
  
  * @returns {JSX.Element} The Room cards and selection buttons.
  */

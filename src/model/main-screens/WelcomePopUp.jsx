@@ -1,7 +1,24 @@
+/**
+ * @file Popup button and toggle button rendered in HomeScreen.
+ *
+ * Contains a popup with information on the App and how to use it.
+ * Also contains a link to the source code and a button to close it.
+ */
 import "@/App.css";
 import "./Popup.css"
 
-
+/**
+ * Welcome information popup.
+ * 
+ * Starts by displaying the welcome popup on first loading the app.
+ * State is remembered as long as the app isn't reloaded,
+ * so the popup only shows up on its own once.
+ * 
+ * @param {object} props
+ * @param {boolean} props.use - State for popup and info button states.
+ * @param {(boolean) => void} props.disable - Toggles between popup and info button states.
+ * @returns {JSX.Element} The popup or info button UI.
+ */
 export default function WelcomePopUp({ use, disable }) {
     let popup;
 
