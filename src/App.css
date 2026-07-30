@@ -331,3 +331,9 @@ button.back-button:active {
     0 0 0 3px rgba(255, 215, 0, 0.4),
     0 0 16px rgba(255, 215, 0, 0.3);
 }
+
+/* Shows dotted red outline of container */
+.debug {
+  outline-style: dashed;
+  outline-color: red;
+}

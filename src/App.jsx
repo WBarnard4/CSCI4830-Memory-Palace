@@ -11,8 +11,6 @@ import HOME_STATES from "@/model/main-screens/States.jsx"
 // 'RoomScreen.jsx' used for page 2 room logic under the primary if-statement
 import RoomScreen from "@/model/room/RoomScreen.jsx";
 
-import RoomFactory from "@/utils/RoomFactory.jsx";
-
 import { saveImage, createRoom, updateRoomName, loadRoom, getAdjacentRoomId } from "@/db/db.js";
 
 
@@ -23,6 +21,8 @@ function App() {
   //useState is a React Hook that establishes states to other components
   //activeRoom is the getter and setActiveRoom is the setter
   //null is the initial value here
+
+  const [usePopup, setPopup] = useState(true);  
 
   const imageInputRef = useRef(null);
   const imageCallbackRef = useRef(null);
@@ -156,7 +156,9 @@ function App() {
         <HomeScreen
           isOpen={homeState}
           openLoad={() => handleHomeMainClick(HOME_STATES.LOAD)}
-          openNew={() => handleHomeMainClick(HOME_STATES.NEW)} />
+          openNew={() => handleHomeMainClick(HOME_STATES.NEW)}
+          usePopup={usePopup}
+          setPopup={setPopup}/>
 
         {/* Create a new room */}
         <NewRoomScreen
