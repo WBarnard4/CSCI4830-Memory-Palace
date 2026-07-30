@@ -1,3 +1,9 @@
+/**
+ * @file Application entry point.
+ *
+ * Mounts the React tree and opens the Dexie database up front so the
+ * first render is not the thing that triggers schema creation.
+ */
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
