@@ -22,7 +22,7 @@ function App() {
   //activeRoom is the getter and setActiveRoom is the setter
   //null is the initial value here
 
-  const [usePopup, setPopup] = useState(true);  
+  const [usePopup, setPopup] = useState(true);
 
   const imageInputRef = useRef(null);
   const imageCallbackRef = useRef(null);
@@ -158,7 +158,7 @@ function App() {
           openLoad={() => handleHomeMainClick(HOME_STATES.LOAD)}
           openNew={() => handleHomeMainClick(HOME_STATES.NEW)}
           usePopup={usePopup}
-          setPopup={setPopup}/>
+          setPopup={setPopup} />
 
         {/* Create a new room */}
         <NewRoomScreen
