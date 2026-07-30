@@ -1,3 +1,10 @@
+/**
+ * @file Root component for Memory Palace.
+ *
+ * Owns the two pieces of app-wide state - which room is open and which
+ * home-screen panel is showing - and hosts the single hidden file input
+ * that every image picker in the app reuses.
+ */
 import "@/App.css";
 import { useState, useRef } from "react";
 
@@ -17,6 +24,15 @@ import { saveImage, createRoom, updateRoomName, loadRoom, getAdjacentRoomId } fr
 
 
 
+/**
+ * Top-level app component.
+ *
+ * Renders the room screen when a room is active, otherwise the home
+ * screen with its New/Load panels. All database access flows through the
+ * handlers below rather than through the child screens.
+ *
+ * @returns {JSX.Element} The app UI.
+ */
 function App() {
   const [activeRoom, setActiveRoom] = useState(null);
   const [homeState, setHomeState] = useState(HOME_STATES.MAIN);
@@ -27,11 +43,34 @@ function App() {
   const imageInputRef = useRef(null);
   const imageCallbackRef = useRef(null);
 
+  /**
+   * Opens the shared hidden file input and registers who should receive
+   * the chosen image.
+   *
+   * Passed down to any child that needs an image (new room backgrounds,
+   * image ideas) so the app only ever has one file input in the DOM.
+   *
+   * @param {function({ file: File, imageId: number, imageSrc: string }): void}
+   *   callback - Invoked once the user picks a file and it has been saved.
+   * @returns {void}
+   */
   function openImagePicker(callback) {
     imageCallbackRef.current = callback;
     imageInputRef.current.click();
   }
 
+  /**
+   * Change handler for the hidden file input.
+   *
+   * Persists the chosen file to the images table, hands the caller both the
+   * new image id and a displayable URL, then clears the input so picking
+   * the same file twice in a row still fires a change event.
+   *
+   * @param {React.ChangeEvent<HTMLInputElement>} event - Change event from
+   *   the file input.
+   * @returns {Promise<void>} Resolves once the callback has run. Returns
+   *   early if the user cancelled the dialog.
+   */
   async function handleImageSelected(event) {
     const file = event.target.files[0];
 
@@ -71,6 +110,15 @@ function App() {
     });
   }
 
+  /**
+   * Opens a room the user selected on the Load Room screen.
+   *
+   * The room has already been read from the database by LoadRoomScreen, so
+   * this just swaps it in and dismisses the panel.
+   *
+   * @param {LoadedRoom} data - Room and ideas to make active.
+   * @returns {void}
+   */
   function handleLoadRoomClick(data) {
     setHomeState(HOME_STATES.MAIN);
     setActiveRoom(data)
@@ -107,11 +155,31 @@ function App() {
   }
 
 
+  /**
+   * Leaves the current room and shows a home-screen panel.
+   *
+   * Any unsaved changes in the open room are dropped: saving is explicit,
+   * so callers should confirm with the user before navigating away.
+   *
+   * @param {number} screen - Target state from HOME_STATES.
+   * @returns {void}
+   */
   function handleGoTo(screen) {
     setActiveRoom(null);
     setHomeState(screen);
   }
 
+  /**
+   * Merges changes into the active room's in-memory state.
+   *
+   * Only the room name is written straight through to the database, since
+   * renaming has no separate save step. Idea edits stay in memory until the
+   * user saves the room explicitly.
+   *
+   * @param {Partial<LoadedRoom>} changes - Fields to merge into the active
+   *   room.
+   * @returns {Promise<void>} Resolves once any name write has committed.
+   */
   async function updateActiveRoom(changes) {
     const roomId = activeRoom.id;
     setActiveRoom((loadedRoom) => {
