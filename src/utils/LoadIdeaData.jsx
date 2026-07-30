@@ -1,1 +1,0 @@
-// return object containing Idea data to be used in Room. Called by LoadRoomData. Might not be necessary?
