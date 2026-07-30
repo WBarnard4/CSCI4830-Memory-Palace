@@ -1,3 +1,10 @@
+/**
+ * @file Handles opening existing Rooms from the database.
+ *
+ * Renders Rooms as selectable cards and provides
+ * search functionality through them.
+ */
+
 import "@/App.css";
 import { LoadRoomData } from "@/utils/LoadRoomData.jsx"
 import HOME_STATES from "./States.jsx"
@@ -5,6 +12,18 @@ import { useState, useEffect, useRef } from "react";
 import { getAllRooms, deleteRoom } from "@/db/db.js";
 const STATES = HOME_STATES;
 
+/**
+ * Room loading screen.
+ * 
+ * Renders when isOpen is set to LOAD, otherwise returns null.
+ * 
+ * @param {object} props
+ * @param {number} props.isOpen - Passed from App to enable or disable component.
+ * @param {() => void} props.onClose - Callback to enable HomeScreen component in App.
+ * @param {() => void} props.onCloseLoad - Callback to enable HomseScreen compoment and set selected Room to active.
+ 
+ * @returns {JSX.Element} The Room cards and selection buttons.
+ */
 export default function LoadRoomScreen({ isOpen, onClose, onCloseLoad }) {
   const [rooms, setRooms] = useState([]);
   const [viewableRooms, setViewableRooms] = useState([]);
@@ -14,6 +33,11 @@ export default function LoadRoomScreen({ isOpen, onClose, onCloseLoad }) {
 
 
   useEffect(() => {
+    /**
+     * Queries all Room data and displays it on screen.
+     * 
+     * Runs when screen is enabled.
+     */
     async function loadRooms() {
       if (isOpen !== STATES.LOAD) {
         return;
@@ -33,6 +57,12 @@ export default function LoadRoomScreen({ isOpen, onClose, onCloseLoad }) {
     loadRooms();
   }, [isOpen]);
 
+  /**
+  * Clears value in Search room button.
+  * 
+  * Runs when Clear Search button is clicked.
+  * Rerenders the available Rooms list.
+  */
   function clearSearch() {
     setViewableRooms(rooms);
 
@@ -41,6 +71,12 @@ export default function LoadRoomScreen({ isOpen, onClose, onCloseLoad }) {
     }
   }
 
+  /**
+  * Updates database Room search condition based on passed value.
+  * 
+  * Runs whenever Search rooms field is updated with text.
+  * @param {*} event - The search term to use.
+  */
   function updateSearch(event) {
     const searchString = event.target.value.trim().toLowerCase();
 
@@ -64,11 +100,23 @@ export default function LoadRoomScreen({ isOpen, onClose, onCloseLoad }) {
   // If state is incorrect, do not render component
   if (isOpen != HOME_STATES.LOAD) return null;
 
+  /**
+  * Enables Delete and Cancel buttons as well as Room selection.
+  * 
+  * Runs when Select is clicked, prevents loading Room by clicking card.
+  * Instead, card is highlighted for deletion.
+  */
   function toggleSelectMode() {
     setSelectMode(!selectMode);
     setSelectedIds([]);
   }
 
+  /**
+  * Toggles card to be deleted.
+  * 
+  * Runs when Room card is clicked during Select Mode.
+  * Can be clicked again to untoggle.
+  */
   function toggleSelected(roomId) {
     setSelectedIds((current) =>
       current.includes(roomId)
@@ -77,6 +125,12 @@ export default function LoadRoomScreen({ isOpen, onClose, onCloseLoad }) {
     );
   }
 
+  /**
+  * Removes Room from database and rerenders available Rooms.
+  * 
+  * Runs when Delete is clicked while at least one card is selected.
+  * Prompts a confirmation popup and disables Select Mode on clicking.
+  */
   async function deleteSelected() {
     if (selectedIds.length === 0) {
       return;
@@ -101,6 +155,11 @@ export default function LoadRoomScreen({ isOpen, onClose, onCloseLoad }) {
     setSelectedIds([]);
   }
 
+  /**
+  * Passes RoomData into App to be rendered.
+  * 
+  * Runs when Room card is clicked.
+  */
   async function exportRoomData(id) {
     const roomData = await LoadRoomData(id);
     if (!roomData) return; // stale or missing id — do nothing rather than open a broken room
