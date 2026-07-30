@@ -109,6 +109,19 @@ export default function LoadRoomScreen({ isOpen, onClose, onCloseLoad }) {
 
   return (
     <div>
+      <input
+        ref={searchInputRef}
+        className="search-input glass-glow glass-surface"
+        type="text"
+        placeholder="Search rooms..."
+        defaultValue=""
+        onChange={updateSearch}
+        onKeyDown={(event) => {
+          if (event.key === "Enter") {
+            event.target.blur();
+          }
+        }}
+      />
       <button
         className="back-button glass-surface glass-glow glass-button"
         onClick={onClose}
@@ -117,63 +130,42 @@ export default function LoadRoomScreen({ isOpen, onClose, onCloseLoad }) {
         &#8592;
       </button>
 
-      <div
-        className={"load-room-controls menu-transition-panel menu-transition-content"}
-        style={{ "--menu-content-open-delay": "0ms" }}
-      >
-        <div className="load-room-controls-content">
-          <input
-            ref={searchInputRef}
-            className="search-input glass-glow glass-surface"
-            type="text"
-            placeholder="Search rooms..."
-            defaultValue=""
-            onChange={updateSearch}
-            onKeyDown={(event) => {
-              if (event.key === "Enter") {
-                event.target.blur();
-              }
-            }}
-          />
+      <div className="load-room-toolbar">
+        <button
+          className="glass-surface glass-glow glass-button glass-ripple"
+          onClick={clearSearch}
+        >
+          Clear Search
+        </button>
 
-          <div className="load-room-toolbar">
+        {!selectMode ? (
+          <button
+            className="glass-surface glass-glow glass-button glass-ripple"
+            onClick={toggleSelectMode}
+          >
+            Select
+          </button>
+        ) : (
+          <>
             <button
-              className="glass-surface glass-glow glass-button glass-ripple"
-              onClick={clearSearch}
+              className="load-delete-button glass-surface glass-glow glass-button glass-ripple"
+              onClick={deleteSelected}
+              disabled={selectedIds.length === 0}
             >
-              Clear Search
+              Delete ({selectedIds.length})
             </button>
 
-            {!selectMode ? (
-              <button
-                className="glass-surface glass-glow glass-button glass-ripple"
-                onClick={toggleSelectMode}
-              >
-                Select
-              </button>
-            ) : (
-              <>
-                <button
-                  className="load-delete-button glass-surface glass-glow glass-button glass-ripple"
-                  onClick={deleteSelected}
-                  disabled={selectedIds.length === 0}
-                >
-                  Delete ({selectedIds.length})
-                </button>
-
-                <button
-                  className="glass-surface glass-glow glass-button glass-ripple"
-                  onClick={toggleSelectMode}
-                >
-                  Cancel
-                </button>
-              </>
-            )}
-          </div>
-        </div>
+            <button
+              className="glass-surface glass-glow glass-button glass-ripple"
+              onClick={toggleSelectMode}
+            >
+              Cancel
+            </button>
+          </>
+        )}
       </div>
 
-      <div className="load-room-grid menu-transition-panel menu-transition-content" style={{ "--menu-content-open-delay": "0ms" }}>
+      <div className="load-room-grid">
         {viewableRooms.map((room) => (
           <button
             key={room.id}
