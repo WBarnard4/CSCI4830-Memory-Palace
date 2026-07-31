@@ -1,3 +1,9 @@
+/**
+ * @file Main page that renders Room and Idea information.
+ *
+ * Contains functionality for updating Room and Ideas,
+ * using Menu, and using Path systems.
+ */
 import { useState, useRef, useEffect } from "react";
 import { Menu } from "@/model/menu/Menu.jsx"
 import { PathMenu } from "./path/PathMenu.jsx"
@@ -10,6 +16,22 @@ const BASE_VIEWPORT_DIMENSIONS = {
   height: 1080,
 }
 
+/**
+ * Primary Room screen.
+ * 
+ * Renders user generated Ideas and provides functionality to
+ * manipulate them and the Room or to return to previous screens.
+ * @param {object} props 
+ * @param {object} props.roomData - Object containing Room data like name and background image.
+ * @param {object} props.updateRoomData - Callback to update Room data object
+ * @param {object} props.openImagePicker - Callback to open image picker from App.
+ * @param {object} props.onGoHome - Callback to enable HomeScreen compoment in App.
+ * @param {object} props.onGoLoad - Callback to enable LoadRoomScreen compoment in App.
+ * @param {object} props.onGoNew - Callback to enable NewRoomScreen compoment in App.
+ * @param {object} props.onChangeRoom - Callback to set active Room to neighboring Room.
+ * 
+ * @returns {JSX.Element} The Room, Idea, Menu, and Path UI elements.
+ */
 export default function RoomScreen({ roomData, updateRoomData, openImagePicker, onGoHome, onGoLoad, onGoNew, onChangeRoom }) {  // state which stores ideas
   const [ideas, setIdeas] = useState(roomData.ideas ?? []);
   const [popupPosition, setPopupPosition] = useState(null);
@@ -57,6 +79,11 @@ export default function RoomScreen({ roomData, updateRoomData, openImagePicker, 
     image.src = roomData.imgSrc;
   }, [roomData.imgSrc]);
 
+  /**
+   * Call openImagePicker to change and update Room's background image.
+   * 
+   * Runs when Menu's Choose Background button is clicked.
+   */
   function pickBackgroundImage() {
     openImagePicker(({ imageId, imageSrc }) => {
       updateRoomData({
@@ -66,6 +93,11 @@ export default function RoomScreen({ roomData, updateRoomData, openImagePicker, 
     });
   }
 
+  /**
+   * Creates a new Image Idea and prompts the user to pick an image.
+   * 
+   * Runs when the Idea Menu's Image button is clicked.
+   */
   function pickIdeaImage() {
     if (!popupPosition) {
       return;
@@ -118,8 +150,10 @@ export default function RoomScreen({ roomData, updateRoomData, openImagePicker, 
       };
     }
 
+    /**
+     * Find the dimensions in the baseline viewport.
+     */
     function updateRoomDimensions() {
-      // Find the dimensions in the baseline viewport.
       const newBaseRoomDimensions = getContainedDimensions(
         BASE_VIEWPORT_DIMENSIONS.width,
         BASE_VIEWPORT_DIMENSIONS.height
@@ -163,11 +197,21 @@ export default function RoomScreen({ roomData, updateRoomData, openImagePicker, 
     }
   }, [ideas, pathActive, pathIndex]);
 
+  /**
+   * Update Room's database entry with any changes.
+   * 
+   * Runs when Menu's Save Room button is clicked.
+   */
   async function handleSave() {
     const roomId = await saveRoom(roomData, ideas);
     roomData.id = roomId; // first save: room now has a DB identity; re-saves reuse it
   }
 
+  /**
+   * Starts the process to close Idea and Menu popups.
+   * 
+   * Runs when new Ideas are created or the popup is clicked off of.
+   */
   function closePopup() {
     if (!popupOpen || popupClosing) {
       return;
@@ -175,6 +219,11 @@ export default function RoomScreen({ roomData, updateRoomData, openImagePicker, 
     setPopupClosing(true);
   }
 
+  /**
+   * Updates states related to popup when its done closing.
+   * 
+   * Runs when popup animation ends.
+   */
   function finishPopupAnimation(event) {
     if (event.target !== event.currentTarget) {
       return;
@@ -187,7 +236,11 @@ export default function RoomScreen({ roomData, updateRoomData, openImagePicker, 
     }
   }
 
-
+  /**
+   * Creates a new Text Idea.
+   * 
+   * Runs when the Idea Menu's Text button is clicked.
+   */
   async function addTextIdea() {
     if (!popupPosition) {
       return;
@@ -209,6 +262,11 @@ export default function RoomScreen({ roomData, updateRoomData, openImagePicker, 
     closePopup();
   }
 
+  /**
+   * Updates the current Idea's data.
+   * 
+   * Runs when the Idea Menu's form is submitted.
+   */
   function updateIdea(newInfo) {
     let current = [...ideas];
     let index = current.findIndex(info => info.id === newInfo.id);
@@ -216,6 +274,11 @@ export default function RoomScreen({ roomData, updateRoomData, openImagePicker, 
     setIdeas(current);
   }
 
+  /**
+   * Deletes the current Idea.
+   * 
+   * Runs when the Idea Menu's Delete button is clicked.
+   */
   function deleteIdea(id) {
     let current = [...ideas];
     let index = current.findIndex(info => info.id === id);
@@ -300,6 +363,12 @@ export default function RoomScreen({ roomData, updateRoomData, openImagePicker, 
     setPopupPosition({ x, y });
   };
 
+  /**
+   * Updates Room name in database.
+   * 
+   * Runs when Menu's name field is updated.
+   * @param {string} name - Name to update to.
+   */
   function updateRoomName(name) {
     updateRoomData({ name: name });
   }

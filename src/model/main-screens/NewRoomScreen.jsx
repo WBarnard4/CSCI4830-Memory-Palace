@@ -1,3 +1,10 @@
+/**
+ * @file Handles creating new Rooms for the database.
+ *
+ * Renders template Rooms as selectable cards and provides
+ * functionality to update their details to make custom Rooms.
+ */
+
 import "@/App.css";
 import HOME_STATES from "./States.jsx"
 import { useState } from "react";
@@ -11,6 +18,19 @@ import bathroomUrl from "@/assets/generic_bathroom.jpg";
 
 const DEFAULT_NAME = "New Room Name"
 
+/**
+ * Room creation screen.
+ * 
+ * Renders when isOpen is set to NEW, otherwise returns null.
+ * 
+ * @param {object} props
+ * @param {number} props.isOpen - Passed from App to enable or disable component.
+ * @param {() => void} props.onClose - Callback to pass new Room data to be rendered in App.
+ * @param {() => void} props.onGoHome - Callback to enable HomeScreen compoment.
+ * @param {() => void} props.openImagePicker - Callback to open image picker from App.
+ 
+ * @returns {JSX.Element} The template Room cards and creation buttons.
+ */
 export default function NewRoomScreen({ isOpen, onClose, onGoHome, openImagePicker }) {
     // If state is incorrect, do not render component
     const [roomCreation, setRoomCreation] = useState({
@@ -21,16 +41,33 @@ export default function NewRoomScreen({ isOpen, onClose, onGoHome, openImagePick
 
     if (isOpen != HOME_STATES.NEW) return null;
 
+    /**
+     * Updates Room editor to use data from template cards.
+     * 
+     * Runs when template cards are clicked.
+     * @param {*} name -  Name of the Room.
+     * @param {*} imgSrc - Source of image file.
+     */
     function setupRoomCreation(name, imgSrc) {
         // Preset backgrounds have no stored image, so clear any
         // previously picked imageId instead of silently dropping it.
         setRoomCreation({ ...roomCreation, imgSrc: imgSrc, imageId: null, name: name })
     }
 
+    /**
+     * Calls onClose with new Room data.
+     * 
+     * Runs when Create Room button is clicked.
+     */
     function createRoom() {
         onClose(roomCreation.name, roomCreation.imageId, roomCreation.imgSrc);
     }
 
+    /**
+     * Calls openImagePicker for background image selection.
+     * 
+     * Runs when Choose Background button is cicked
+     */
     function pickBackground() {
         openImagePicker(({ imageId, imageSrc }) => {
             setRoomCreation({
@@ -42,6 +79,12 @@ export default function NewRoomScreen({ isOpen, onClose, onGoHome, openImagePick
         });
     }
 
+    /**
+     * Updates new Room name based on the name entry field.
+     * 
+     * Runs when field is submitted or loses focus.
+     * @param {*} event - The name to be updated to.
+     */
     function newNameEntered(event) {
         // Commit on Enter OR when the field loses focus, so clicking
         // "Create Room" directly still saves the typed name.
@@ -75,7 +118,7 @@ export default function NewRoomScreen({ isOpen, onClose, onGoHome, openImagePick
             >
                 &#8592;
             </button>
-            <div className="room-grid menu-transition-content menu-transition-panel" style={{"--menu-content-open-delay": "0ms"}}>
+            <div className="room-grid menu-transition-content menu-transition-panel" style={{ "--menu-content-open-delay": "0ms" }}>
                 {/* Preset background cards; the chosen one glows */}
                 {[
                     { name: "Bedroom", url: bedroomUrl },

@@ -1,0 +1,48 @@
+/* For WelcomePopUp, centers it in viewport */
+.popup {
+    position: absolute;
+    left: 50%;
+    top: 20%;
+    margin: auto;
+    transform: translate(-50%, -20%);
+    z-index: 1;
+
+    --radius: 11px;
+}
+
+.popup .panel {
+    --glass-surface-opacity: 0.25;
+    --glass-background-hover-opacity: 0.25;
+    --glass-blur: 15px;
+    border-radius: var(--radius);
+}
+
+.popup .header {
+    padding: 5px;
+}
+
+.popup .text {
+    border-radius: var(--radius);
+    color: black;
+    vertical-align: top;
+}
+
+.popup .close-button {
+    border-radius: 3px;
+    min-width: 20%;
+}
+
+.info-popup {
+    position: absolute;
+    left: 5%;
+    top: 5%;
+    margin: auto;
+    z-index: 1;
+}
+
+.info-popup .info-button {
+    border-radius: 3px;
+    border-color: white;
+    color: white;
+    min-width: 10%;
+}

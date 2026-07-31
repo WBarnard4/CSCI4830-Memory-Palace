@@ -1,5 +1,42 @@
+/**
+ * @file Container for displaying and updating Idea information
+ *
+ * Contains functionality for updating Idea data and visuals.
+ */
 import { useState, useRef, useLayoutEffect } from "react";
 
+/**
+ * Idea container and related functions.
+ * 
+ * Renders when ideas in RoomScreen contains this Ideas information.
+ * 
+ * @param {object} props 
+ * @param {number} props.id - Idea ID in database.
+ * @param {string} props.type - Text or Image type.
+ * @param {number} props.x - X position on screen.
+ * @param {number} props.y - Y position on screen.
+ * @param {number} props.w - Width on screen.
+ * @param {number} props.h - Height on screen.
+ * @param {number} props.r - Rotation on screen.
+ * @param {string} props.title - Display for Text idea, title shown in Idea Menu.
+ * @param {string} props.text - Description shown in Menu.
+ * @param {object} props.roomBaseDimensions - Dimensions of the Room.
+ * @param {number} props.imageId - Image ID in database.
+ * @param {string} props.imageSrc - Source of image file.
+ * @param {boolean} props.highlighted - Toggles highlight from Idea Menu.
+ * @param {boolean} props.pathHighlighted - Toggles highlight from Path.
+ * @param {boolean} props.pathActive - Current Path ID.
+ * @param {number} props.zIndex - Render height, updated when highlighted.
+ * @param {() => null} props.updateIdea - Callback to update Idea in RoomScreen's ideas
+ * @param {() => null} props.deleteIdea - Callback to delete Idea from RoomScreen's ideas
+ * @param {() => null} props.openImagePicker - Callback to open image picker from App.
+ * @param {() => null} props.moveIdeaBack - Callback to swap Idea's Path order with its previous neighbor
+ * @param {() => null} props.moveIdeaForward - Callback to swap Idea's Path order with its next neighbor
+ * @param {boolean} props.isFirst - Checks if Idea is first in Path
+ * @param {boolean} props.isLast - Checks if Idea is last in Path
+ * @param {RefObject<>} props.roomRef - Reference to the Room for calculating boundaries.
+ * @returns {JSX.Element} The Idea and popup UI elements.
+ */
 export function Idea({ id, type, x, y, w, h, r, title, text, roomBaseDimensions, imageId, imageSrc, highlighted, pathHighlighted, pathActive, zIndex, updateIdea, deleteIdea, openImagePicker, moveIdeaBack, moveIdeaForward, isFirst, isLast, roomRef }) {
   const [menuActive, setMenuActive] = useState(false);
   const [menuClosing, setMenuClosing] = useState(false);
@@ -42,6 +79,13 @@ export function Idea({ id, type, x, y, w, h, r, title, text, roomBaseDimensions,
   // glow if manually highlighted OR the path is currently sitting on this one
   const isHighlighted = ideaInfo.highlighted || pathHighlighted;
 
+  /**
+   * Calculates element's screen position if its too close to the edge.
+   * @param {number} value - Current x or y position
+   * @param {number} min - Lower bound
+   * @param {number} max - Upper bound
+   * @returns {number} New x or y position
+   */
   function clamp(value, min, max) {
     return Math.min(Math.max(value, min), max);
   }
@@ -312,6 +356,11 @@ export function Idea({ id, type, x, y, w, h, r, title, text, roomBaseDimensions,
     setDragRotation(null);
   }
 
+  /**
+   * Updates the Idea to be highlighted or not.
+   * 
+   * Runs when Idea Menu's Highlight button is clicked.
+   */
   function toggleHighlight() {
     updateIdea({
       ...ideaInfo,
@@ -319,6 +368,12 @@ export function Idea({ id, type, x, y, w, h, r, title, text, roomBaseDimensions,
     });
   }
 
+  /**
+   * Update Idea info based on form data.
+   * 
+   * Runs when Idea Menu's form is submitted.
+   * @param {*} e - Form data
+   */
   function setInfo(e) {
     e.preventDefault();
 
@@ -339,12 +394,22 @@ export function Idea({ id, type, x, y, w, h, r, title, text, roomBaseDimensions,
     closeMenu();
   }
 
+  /**
+   * Starts Idea deletion process.
+   * 
+   * Runs when Idea Menu's Delete Idea button is clicked.
+   */
   function handleDelete() {
     setMenuDeleting(true);
     setIdeaShown(false);
     closeMenu();
   }
 
+  /**
+   * Changes Image Idea's image with openImagePicker.
+   * 
+   * Runs when Idea Menu's Select Image button is clicked.
+   */
   function chooseNewImage() {
     openImagePicker(({ imageId, imageSrc }) => {
       const newInfo = {
@@ -357,16 +422,33 @@ export function Idea({ id, type, x, y, w, h, r, title, text, roomBaseDimensions,
     });
   }
 
+  /**
+   * Swaps Idea's Path order with the preceding Idea's.
+   * 
+   * Runs when Idea Menu's Back button is clicked.
+   * @param {*} e - Function call, used for stopPropagation
+   */
   function handleMoveBack(e) {
     e.stopPropagation();
     moveIdeaBack(ideaInfo.id);
   }
 
+  /**
+   * Swaps Idea's Path order with the next Idea's.
+   * 
+   * Runs when Idea Menu's Forward button is clicked.
+   * @param {*} e - Function call, used for stopPropagation
+   */
   function handleMoveForward(e) {
     e.stopPropagation();
     moveIdeaForward(ideaInfo.id);
   }
 
+  /**
+   * Closes Idea Menu
+   * 
+   * Runs when Idea is clicked again or when Idea is updated/deleted.
+   */
   function closeMenu() {
     if (!menuActive || menuClosing) {
       return;
@@ -375,6 +457,9 @@ export function Idea({ id, type, x, y, w, h, r, title, text, roomBaseDimensions,
     setMenuClosing(true);
   }
 
+  /**
+   * Shows Idea when opening animation ends.
+   */
   function finishIdeaAnimation(event) {
     if (event.target !== event.currentTarget) {
       return;
@@ -384,6 +469,9 @@ export function Idea({ id, type, x, y, w, h, r, title, text, roomBaseDimensions,
     }
   }
 
+  /**
+   * Shows/hides Menu when opening/closing animation ends.
+   */
   function finishMenuAnimation(event) {
     if (event.target !== event.currentTarget) {
       return;

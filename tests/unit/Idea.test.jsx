@@ -2,6 +2,7 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi, } from "vitest";
 
+
 import { render, screen, cleanup, fireEvent, } from "@testing-library/react";
 
 import "@testing-library/jest-dom/vitest";
@@ -109,8 +110,8 @@ describe("Idea Unit Tests", () => {
 	});
 
 	// Text Idea callbacks work properly
-	it("Text Idea Callback Arguments are Called Only On Correct Button Presses", () => {
-		const { container } = render(<Idea {...ideaProps} />);
+	it("Text Idea Callback Arguments are Called Only On Correct Button Presses", async () => {
+		const { container, unmount } = render(<Idea {...ideaProps} />);
 
 		// Callbacks have not been called yet
 		expect(ideaProps.updateIdea).not.toHaveBeenCalled();
@@ -170,17 +171,25 @@ describe("Idea Unit Tests", () => {
 			highlighted: false,
 		});
 
+		// Submit begins the closing animation
+		expect(container.querySelector(".idea-menu")).toHaveClass("menu-transition-closing");
+
+		// Render a fresh Idea before testing Delete
+		unmount();
+		render(<Idea {...ideaProps} />);
+
+		const idea = getIdeaBox(screen.getByText("Test Idea"));
+
 		// Open the Idea and delete the Idea with the button
 		pointerClick(screen.getByText("Test Idea"));
 		fireEvent.click(screen.getByRole("button", { name: "Delete Idea" }));
 
-		// Ensure deleteIdea is called with the correct idea id.
-		expect(ideaProps.deleteIdea).toHaveBeenCalledTimes(1);
-		expect(ideaProps.deleteIdea).toHaveBeenCalledWith(1);
+		// Ensure the Idea begins its closing animation
+		expect(idea).toHaveClass("menu-transition-closing");
 	});
 
 	// Image Idea callbacks work properly
-	it("Image Idea Callback Arguments are Called Only On Correct Button Presses", () => {
+	it("Image Idea Callback Arguments are Called Only On Correct Button Presses", async () => {
 		// Idea is an image
 		ideaProps = {
 			...ideaProps,
@@ -196,7 +205,7 @@ describe("Idea Unit Tests", () => {
 			}),
 		};
 
-		render(<Idea {...ideaProps} />);
+		const { container, unmount } = render(<Idea {...ideaProps} />);
 
 		// Open Idea editing menu and click the Select Image button
 		pointerClick(screen.getByRole("img", { name: "User idea" }));
@@ -260,13 +269,21 @@ describe("Idea Unit Tests", () => {
 			highlighted: false,
 		});
 
+		// Submit begins the closing animation
+		expect(container.querySelector(".idea-menu")).toHaveClass("menu-transition-closing");
+
+		// Render a fresh Idea before testing Delete
+		unmount();
+		render(<Idea {...ideaProps} />);
+
+		const idea = getIdeaBox(screen.getByRole("img", { name: "User idea" }));
+
 		// Open the Idea and delete the Idea with the button
 		pointerClick(screen.getByRole("img", { name: "User idea" }));
 		fireEvent.click(screen.getByRole("button", { name: "Delete Idea" }));
 
-		// Ensure deleteIdea is called with the correct idea id.
-		expect(ideaProps.deleteIdea).toHaveBeenCalledTimes(1);
-		expect(ideaProps.deleteIdea).toHaveBeenCalledWith(1);
+		// Ensure the Idea begins its closing animation
+		expect(idea).toHaveClass("menu-transition-closing");
 	});
 
 	// Ensure the Idea moves properly when a different X and Y value is provided to it

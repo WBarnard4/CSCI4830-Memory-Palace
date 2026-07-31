@@ -1,4 +1,3 @@
-// return object containing Room data to be used in RoomFactory. Called by RoomFactory.
 import { loadRoom } from "@/db/db.js";
 
 /**
