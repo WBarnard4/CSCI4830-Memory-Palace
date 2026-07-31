@@ -67,7 +67,7 @@ export default function WelcomePopUp({ use, disable }) {
                 <button
                     className="info-button glass-surface glass-glow glass-button"
                     onClick={() => disable(true)}
-                    aria-label="Back to home"
+                    aria-label="Info"
                 >
                     Info
                 </button>
