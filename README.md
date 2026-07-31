@@ -46,5 +46,16 @@ In a web browser, navigate to that address to access the website.
 ## 7/17/2026
 - App has been refactored to separate HomeScreen, LoadRoomScreen, and NewRoomScreen into individual classes that can pass a roomData object between them.
 - IndexedDB database has been implemented to save Room data (Room name, Idea data, etc.) via the Room Menu. This can be loaded in the LoadRoomScreen through the roomData object.
-- Ideas can be reorded via the Idea Menu which changes their position in the Path system.
+- Ideas can be reordered via the Idea Menu which changes their position in the Path system.
 - A tests folder and test files have been created to implement unit tests on certain functions.
+
+## 7/31/2026
+- CSS has been overhauled to use new "Glass" styling for most elements such as buttons and textareas. Positioning of elements like Memory Palace title and subtitle has been adjusted.
+- Welcome Popup has been added to HomeScreen
+- Back buttons have been added to LoadRoomScreen and NewRoomScreen to return to HomeScreen
+- LoadRoomScreen displays Room background images on Room Cards. Added Search and Delete buttons to filter or remove Rooms from database.
+- Added functionality to Room's Menu to swap to adjacent Room screens.
+- Added description field to Idea's edit menu for both Text and Image Ideas. Added functionality to adjust Idea and its edit menu's positions relative to the edge of the screen.
+- Added functionality to adjust Idea position by clicking and dragging and to adjust Idea size/rotation by clicking on provided bubbles.
+- Added/updated test files for all main classes, includes database functionality.
+- Added functionality to deploy to GitHub Pages and Vercel.
