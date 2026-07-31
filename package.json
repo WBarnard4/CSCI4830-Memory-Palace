@@ -13,10 +13,12 @@
     "preview": "vite preview",
     "test": "vitest",
     "test:unit": "vitest run tests/unit",
-    "test:system": "vitest run tests/system"
+    "test:system": "vitest run tests/system",
+    "docs": "jsdoc -c jsdoc.conf.json"
   },
   "dependencies": {
     "dexie": "^4.4.3",
+    "jsdoc": "^4.0.5",
     "react": "^19.2.6",
     "react-dom": "^19.2.6"
   },
